@@ -1,20 +1,25 @@
 package pl.elpassion.instaroom
 
-import io.ktor.application.*
-import io.ktor.response.*
-import io.ktor.request.*
-import io.ktor.routing.*
-import io.ktor.http.*
-import io.ktor.html.*
-import kotlinx.html.*
-import kotlinx.css.*
-import io.ktor.content.*
-import io.ktor.http.content.*
+import io.ktor.application.Application
+import io.ktor.application.ApplicationCall
+import io.ktor.application.call
+import io.ktor.application.install
+import io.ktor.auth.Authentication
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.apache.Apache
+import io.ktor.html.respondHtml
+import io.ktor.http.ContentType
+import io.ktor.http.content.resources
+import io.ktor.http.content.static
+import io.ktor.response.respond
+import io.ktor.response.respondText
+import io.ktor.routing.get
+import io.ktor.routing.routing
 import io.ktor.sessions.*
-import io.ktor.auth.*
-import io.ktor.features.*
-import io.ktor.client.*
-import io.ktor.client.engine.apache.*
+import kotlinx.css.*
+import kotlinx.html.*
+import kotlin.collections.mapOf
+import kotlin.collections.set
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.DevelopmentEngine.main(args)
 
