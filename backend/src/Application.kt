@@ -136,8 +136,8 @@ val googleOauthProvider = OAuthServerSettings.OAuth2ServerSettings(
     accessTokenUrl = "https://www.googleapis.com/oauth2/v3/token",
     requestMethod = HttpMethod.Post,
 
-    clientId = "todo some client id",
-    clientSecret = "todo some client secret",
+    clientId = System.getenv("INSTAROOM_WEB_CLIENT_ID"),
+    clientSecret = System.getenv("INSTAROOM_WEB_CLIENT_SECRET"),
     defaultScopes = listOf("profile", "https://www.googleapis.com/auth/calendar.events")
 )
 
