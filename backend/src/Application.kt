@@ -56,7 +56,31 @@ fun Application.module(testing: Boolean = false) {
 
     routing {
         get("/") {
-            call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
+
+            val accessToken = call.sessions.get<MySession>()?.accessToken
+
+            if (accessToken === null) {
+                call.respondHtml {
+                    body {
+                        h2 { +"Unknown user" }
+                        h2 { a("/login") { +"Login" } }
+                    }
+                }
+            } else {
+                val stuff = calendarStuff(accessToken)
+
+                call.respondHtml {
+                    body {
+                        h2 { +"Hi user" }
+                        ul {
+                            for (event in stuff) {
+                                li { h4 { +event } }
+                            }
+                        }
+                        h2 { a("/login") { +"Login again" } }
+                    }
+                }
+            }
         }
 
         get("/html-dsl") {
@@ -91,12 +115,6 @@ fun Application.module(testing: Boolean = false) {
             resources("static")
         }
 
-        get("/session/increment") {
-            val session = call.sessions.get<MySession>() ?: MySession()
-            call.sessions.set(session.copy(count = session.count + 1))
-            call.respondText("Counter is ${session.count}. Refresh to increment.")
-        }
-
         authenticate("google-oauth") {
             route("/login") {
                 handle {
@@ -105,25 +123,28 @@ fun Application.module(testing: Boolean = false) {
 
                     val accessToken = principal.accessToken
 
+                    call.sessions.set(MySession(accessToken))
+
                     val json = HttpClient(Apache).get<String>("https://www.googleapis.com/userinfo/v2/me") {
                         header("Authorization", "Bearer $accessToken")
                     }
 
                     println(json)
 
-                    val stuff = calendarStuff(accessToken)
-
-                    println(stuff)
-
-                    call.respondText("$json\n$stuff")
+                    call.respondHtml {
+                        body {
+                            h2 { +"User details" }
+                            code { +json }
+                            h2 { a("/") { +"Go back to calendar" } }
+                        }
+                    }
                 }
-
             }
         }
     }
 }
 
-data class MySession(val count: Int = 0)
+data class MySession(val accessToken: String)
 
 fun FlowOrMetaDataContent.styleCss(builder: CSSBuilder.() -> Unit) {
     style(type = ContentType.Text.CSS.toString()) {
