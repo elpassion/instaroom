@@ -4,21 +4,26 @@ import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.application.install
-import io.ktor.auth.Authentication
+import io.ktor.auth.*
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.apache.Apache
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.features.origin
 import io.ktor.html.respondHtml
 import io.ktor.http.ContentType
+import io.ktor.http.HttpMethod
 import io.ktor.http.content.resources
 import io.ktor.http.content.static
-import io.ktor.response.respond
+import io.ktor.request.host
+import io.ktor.request.port
 import io.ktor.response.respondText
 import io.ktor.routing.get
+import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.sessions.*
 import kotlinx.css.*
 import kotlinx.html.*
-import kotlin.collections.mapOf
 import kotlin.collections.set
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.DevelopmentEngine.main(args)
@@ -33,6 +38,11 @@ fun Application.module(testing: Boolean = false) {
     }
 
     install(Authentication) {
+        oauth("google-oauth") {
+            client = HttpClient(Apache)
+            providerLookup = { googleOauthProvider }
+            urlProvider = { redirectUrl("/login") }
+        }
     }
 
     val client = HttpClient(Apache) {
@@ -81,8 +91,25 @@ fun Application.module(testing: Boolean = false) {
             call.respondText("Counter is ${session.count}. Refresh to increment.")
         }
 
-        get("/json/jackson") {
-            call.respond(mapOf("hello" to "world"))
+        authenticate("google-oauth") {
+            route("/login") {
+                handle {
+                    val principal = call.authentication.principal<OAuthAccessTokenResponse.OAuth2>()
+                        ?: error("No principal")
+
+                    val accessToken = principal.accessToken
+
+                    val json = HttpClient(Apache).get<String>("https://www.googleapis.com/userinfo/v2/me") {
+                        header("Authorization", "Bearer $accessToken")
+                    }
+
+                    println(json)
+
+                    call.respondText(json)
+                }
+
+            }
+
         }
     }
 }
@@ -101,4 +128,22 @@ fun CommonAttributeGroupFacade.style(builder: CSSBuilder.() -> Unit) {
 
 suspend inline fun ApplicationCall.respondCss(builder: CSSBuilder.() -> Unit) {
     this.respondText(CSSBuilder().apply(builder).toString(), ContentType.Text.CSS)
+}
+
+val googleOauthProvider = OAuthServerSettings.OAuth2ServerSettings(
+    name = "google",
+    authorizeUrl = "https://accounts.google.com/o/oauth2/auth",
+    accessTokenUrl = "https://www.googleapis.com/oauth2/v3/token",
+    requestMethod = HttpMethod.Post,
+
+    clientId = "todo some client id",
+    clientSecret = "todo some client secret",
+    defaultScopes = listOf("profile", "https://www.googleapis.com/auth/calendar.events")
+)
+
+private fun ApplicationCall.redirectUrl(path: String): String {
+    val defaultPort = if (request.origin.scheme == "http") 80 else 443
+    val hostPort = request.host()!! + request.port().let { port -> if (port == defaultPort) "" else ":$port" }
+    val protocol = request.origin.scheme
+    return "$protocol://$hostPort$path"
 }
