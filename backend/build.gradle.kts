@@ -7,7 +7,7 @@ val logback_version: String by project
 
 plugins {
     application
-    kotlin("jvm") version "1.2.71"
+    kotlin("jvm")
 }
 
 group = "instaroom"

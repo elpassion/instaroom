@@ -5,3 +5,4 @@ out
 gen
 backend/build/
 build/
+/local.properties
