@@ -1,5 +1,11 @@
 package pl.elpassion.instaroom
 
+import com.google.api.client.auth.oauth2.BearerToken
+import com.google.api.client.auth.oauth2.Credential
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
+import com.google.api.client.json.jackson2.JacksonFactory
+import com.google.api.client.util.DateTime
+import com.google.api.services.calendar.Calendar
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
@@ -105,11 +111,14 @@ fun Application.module(testing: Boolean = false) {
 
                     println(json)
 
-                    call.respondText(json)
+                    val stuff = calendarStuff(accessToken)
+
+                    println(stuff)
+
+                    call.respondText("$json\n$stuff")
                 }
 
             }
-
         }
     }
 }
@@ -146,4 +155,27 @@ private fun ApplicationCall.redirectUrl(path: String): String {
     val hostPort = request.host()!! + request.port().let { port -> if (port == defaultPort) "" else ":$port" }
     val protocol = request.origin.scheme
     return "$protocol://$hostPort$path"
+}
+
+
+private val transport = GoogleNetHttpTransport.newTrustedTransport()
+
+private val jsonFactory = JacksonFactory.getDefaultInstance()
+
+private fun calendarStuff(token: String): List<String> {
+
+    val credential = Credential(BearerToken.authorizationHeaderAccessMethod()).setAccessToken(token)
+
+    val calendar = Calendar.Builder(transport, jsonFactory, credential).build()
+
+    val now = DateTime(System.currentTimeMillis())
+
+    val events = calendar.events().list("primary")
+        .setMaxResults(10)
+        .setTimeMin(now)
+        .setOrderBy("startTime")
+        .setSingleEvents(true)
+        .execute()
+
+    return events.items.map { "${it.summary} (${it.start.dateTime ?: it.start.date})" }
 }
