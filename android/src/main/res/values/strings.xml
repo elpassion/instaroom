@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">InstaRoom</string>
+    <string name="this_room_is_free_now">This room is free now.</string>
+    <string name="appointment_created">Appointment created</string>
+    <string name="dismiss">dismiss</string>
+    <string name="edit_in_google_calendar">edit in google calendar</string>
+    <string name="quick">quick</string>
+    <string name="precise">precise</string>
+    <string name="cancel">cancel</string>
+    <string name="precise">precise</string>
+    <string name="appointment_name">Appointment name</string>
+    <string name="from">from</string>
+    <string name="to">to</string>
+    <string name="appointment_duration">Appointment duration</string>
+    <string name="all_day_appointment">All-day appointment</string>
+    <string name="making_an_appointment">Making an appointment</string>
 </resources>

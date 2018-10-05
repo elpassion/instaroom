@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="@dimen/basic_padding"
+        app:layout_constraintStart_toStartOf="@id/appointment_settings_guideline_start"
+        android:id="@+id/appointment_settings_name_tv"
+        android:text="@string/appointment_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <EditText
+        app:layout_constraintTop_toBottomOf="@id/appointment_settings_name_tv"
+        app:layout_constraintStart_toStartOf="@id/appointment_settings_guideline_start"
+        android:id="@+id/appointment_settings_name_et"
+        android:layout_width="0dp"
+        app:layout_constraintEnd_toEndOf="@id/appointment_settings_guideline_end"
+        tools:text="John Doe's booking"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_marginTop="@dimen/large_padding"
+        android:text="@string/appointment_duration"
+        app:layout_constraintTop_toBottomOf="@id/appointment_settings_name_et"
+        app:layout_constraintStart_toStartOf="@id/appointment_settings_guideline_start"
+        android:id="@+id/appointment_settings_duration_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_marginTop="@dimen/basic_padding"
+        app:layout_constraintStart_toStartOf="@id/appointment_settings_guideline_start"
+        app:layout_constraintTop_toBottomOf="@id/appointment_settings_duration_tv"
+        android:textAllCaps="true"
+        android:text="@string/from"
+        android:id="@+id/appointment_settings_from_tv"
+        android:layout_width="0dp"
+        app:layout_constraintEnd_toStartOf="@id/appointment_settings_to_tv"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:textAllCaps="true"
+        app:layout_constraintEnd_toEndOf="@id/appointment_settings_guideline_end"
+        android:text="@string/to"
+        app:layout_constraintBaseline_toBaselineOf="@id/appointment_settings_from_tv"
+        android:id="@+id/appointment_settings_to_tv"
+        android:layout_width="0dp"
+        app:layout_constraintStart_toEndOf="@id/appointment_settings_from_tv"
+        android:layout_height="wrap_content" />
+
+    <EditText
+        android:id="@+id/appointment_settings_time_from_et"
+        app:layout_constraintTop_toBottomOf="@id/appointment_settings_from_tv"
+        app:layout_constraintStart_toStartOf="@id/appointment_settings_from_tv"
+        android:layout_width="110dp"
+        android:layout_height="wrap_content" />
+
+    <View
+        android:background="@android:color/black"
+        app:layout_constraintBottom_toBottomOf="@id/appointment_settings_time_from_et"
+        app:layout_constraintTop_toTopOf="@id/appointment_settings_time_from_et"
+        app:layout_constraintEnd_toStartOf="@id/appointment_settings_time_to_et"
+        app:layout_constraintStart_toEndOf="@id/appointment_settings_time_from_et"
+        android:layout_width="12dp"
+        android:layout_height="2dp"/>
+
+    <EditText
+        android:id="@+id/appointment_settings_time_to_et"
+        app:layout_constraintStart_toStartOf="@id/appointment_settings_to_tv"
+        app:layout_constraintTop_toBottomOf="@id/appointment_settings_from_tv"
+        android:layout_width="110dp"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_marginTop="@dimen/basic_padding"
+        android:text="@string/all_day_appointment"
+        app:layout_constraintStart_toStartOf="@id/appointment_settings_guideline_start"
+        app:layout_constraintTop_toBottomOf="@id/appointment_settings_time_from_et"
+        android:id="@+id/appointment_settings_all_day_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Switch
+        android:layout_marginStart="@dimen/basic_padding"
+        app:layout_constraintStart_toEndOf="@id/appointment_settings_all_day_tv"
+        app:layout_constraintBottom_toBottomOf="@id/appointment_settings_all_day_tv"
+        app:layout_constraintTop_toTopOf="@id/appointment_settings_all_day_tv"
+        android:id="@+id/appointment_settings_all_day_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <android.support.constraint.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/appointment_settings_guideline_start"
+        app:layout_constraintGuide_begin="16dp"
+        android:orientation="vertical" />
+
+    <android.support.constraint.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/appointment_settings_guideline_end"
+        app:layout_constraintGuide_end="16dp"
+        android:orientation="vertical" />
+
+</android.support.constraint.ConstraintLayout>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        app:layout_constraintStart_toStartOf="parent"
+        android:id="@+id/appointment_settings_room_icon_iv"
+        android:padding="5dp"
+        app:layout_constraintEnd_toStartOf="@id/appointment_settings_room_title_tv"
+        android:src="@drawable/ic_android"
+        android:background="@drawable/round"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintBottom_toBottomOf="@id/appointment_settings_room_title_tv"
+        app:layout_constraintTop_toTopOf="@id/appointment_settings_room_title_tv"
+        android:layout_width="32dp"
+        android:layout_height="32dp" />
+
+    <TextView
+        app:layout_constraintEnd_toEndOf="parent"
+        android:paddingBottom="14dp"
+        android:textSize="14sp"
+        android:paddingTop="14dp"
+        android:layout_marginStart="@dimen/medium_padding"
+        app:layout_constraintStart_toEndOf="@id/appointment_settings_room_icon_iv"
+        android:id="@+id/appointment_settings_room_title_tv"
+        android:textAllCaps="true"
+        tools:text="booking green room"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <View
+        android:id="@+id/appointment_settings_first_separator"
+        android:layout_width="match_parent"
+        app:layout_constraintTop_toBottomOf="@id/appointment_settings_room_title_tv"
+        android:layout_height="0.7dp" />
+
+    <com.google.android.material.tabs.TabLayout
+        app:layout_constraintTop_toBottomOf="@id/appointment_settings_first_separator"
+        android:id="@+id/appointment_settings_tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.tabs.TabItem
+            android:text="@string/quick"
+            android:id="@+id/appointment_tabs_quick_tab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <com.google.android.material.tabs.TabItem
+            android:text="@string/precise"
+            android:id="@+id/appointment_tabs_precise_tab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </com.google.android.material.tabs.TabLayout>
+
+    <FrameLayout
+        app:layout_constraintTop_toBottomOf="@id/appointment_settings_tab_layout"
+        android:id="@+id/appointment_settings_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:layout_marginBottom="16dp"
+        style="@style/Button.White"
+        android:layout_marginTop="@dimen/basic_padding"
+        app:layout_constraintTop_toBottomOf="@id/appointment_settings_container"
+        android:text="@string/cancel"
+        android:layout_marginEnd="@dimen/small_padding"
+        app:layout_constraintEnd_toStartOf="@id/appointment_settings_book_button"
+        android:id="@+id/appointment_settings_cancel_button"
+        app:layout_constraintStart_toStartOf="@id/bh_appointment_settings_start_guideline"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:layout_marginStart="@dimen/small_padding"
+        style="@style/Button.Blue"
+        app:layout_constraintBaseline_toBaselineOf="@id/appointment_settings_cancel_button"
+        android:text="@string/precise"
+        app:layout_constraintStart_toEndOf="@id/appointment_settings_cancel_button"
+        android:id="@+id/appointment_settings_book_button"
+        app:layout_constraintEnd_toEndOf="@id/bh_appointment_settings_end_guideline"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" />
+
+    <android.support.constraint.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/bh_appointment_settings_start_guideline"
+        app:layout_constraintGuide_begin="16dp"
+        android:orientation="vertical" />
+
+    <android.support.constraint.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/bh_appointment_settings_end_guideline"
+        app:layout_constraintGuide_end="16dp"
+        android:orientation="vertical" />
+
+</android.support.constraint.ConstraintLayout>
