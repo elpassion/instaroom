@@ -91,6 +91,10 @@
         <div class="mdl-grid demo-content">
             <div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
                 <p>${user}</p>
+                <#list events as event>
+                    <p>${event}</p>
+                </#list>
+
             </div>
         </div>
     </main>

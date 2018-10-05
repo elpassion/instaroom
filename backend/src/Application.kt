@@ -89,7 +89,12 @@ fun Application.module(testing: Boolean = false) {
     routing {
         get("/template") {
             val user = "user name"
-            call.respond(FreeMarkerContent("index.ftl", mapOf("user" to user), "e"))
+
+            val accessToken = call.sessions.get<MySession>()?.accessToken
+
+            val calendarStuff = accessToken?.let { calendarStuff(it) } ?: listOf("No access token")
+
+            call.respond(FreeMarkerContent("index.ftl", mapOf("user" to user, "events" to calendarStuff), "e"))
         }
 
         get("/") {
