@@ -15,7 +15,7 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
     fun getGoogleToken(): LiveData<String> = googleTokenLiveData
 
     fun saveGoogleToken(token: String) {
-        googleTokenLiveData.value = token
+        googleTokenLiveData.postValue(token)
         loginRepository.googleToken = token
     }
 }

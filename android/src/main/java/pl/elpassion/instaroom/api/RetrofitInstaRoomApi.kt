@@ -8,7 +8,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 object RetrofitInstaRoomApi : InstaRoomApi {
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl("http://pacific-lowlands-76710.herokuapp.com")
+        .baseUrl("http://instaroom.app.elpassion.com")
         .addCallAdapterFactory(CoroutineCallAdapterFactory())
         .addConverterFactory(MoshiConverterFactory.create())
         .build()
