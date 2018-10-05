@@ -30,6 +30,7 @@ import io.ktor.request.port
 import io.ktor.response.respond
 import io.ktor.response.respondText
 import io.ktor.routing.get
+import io.ktor.routing.post
 import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.sessions.*
@@ -39,9 +40,19 @@ import kotlin.collections.set
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.DevelopmentEngine.main(args)
 
+enum class Salka(val title: String, val calendarId: String) {
+
+    SALKA_PRZY_DEVELOPERACH("Salka przy deweloperach", idSalkaPrzyDeveloperach),
+    SALKA_PRZY_RECEPCJI("Salka przy recepcji", idSalkaPrzyRecepcji),
+    SALKA_ZIELONA("Salka zielona", idSalkaZielona),
+    SALKA_ZOLTA("Salka zolta", idSalkaZolta),
+    SALKA_PRZY_GRAFIKACH("Salka przy grafikach", idSalkaPrzyGrafikach)
+
+}
+
 data class Event(val name: String, val startTime: String, val endTime: String)
 
-data class Room(val name: String, val isFreeNow: Boolean, val events: List<Event>)
+data class Room(val name: String, val calendarId: String, val isFreeNow: Boolean, val events: List<Event>)
 
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
@@ -89,6 +100,7 @@ fun Application.module(testing: Boolean = false) {
                 call.respondHtml {
                     body {
                         h2 { +"Hi user" }
+                        h3 { +accessToken }
                         ul {
                             for (event in stuff) {
                                 li { h4 { +event } }
@@ -109,6 +121,14 @@ fun Application.module(testing: Boolean = false) {
                 val rooms = getSomeRooms(accessToken)
                 val data = mapOf("rooms" to rooms)
                 call.respond(data)
+            }
+        }
+
+        post("/book") {
+            call.respondHtml {
+                body {
+                    h2 { +"TODO" }
+                }
             }
         }
 
@@ -259,7 +279,7 @@ private fun Calendar.getSomeRooms() = listOf(
 )
 
 private fun Calendar.getRoom(name: String, calendarId: String) =
-    Room(name, true, getSomeEvents(calendarId)) // TODO: isFreeNow support
+    Room(name, calendarId, true, getSomeEvents(calendarId)) // TODO: isFreeNow support
 
 private fun Calendar.getSomeEvents(calendarId: String) =
     events().list(calendarId)
