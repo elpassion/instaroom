@@ -10,6 +10,10 @@ plugins {
     kotlin("jvm")
 }
 
+apply {
+    from("jarsetup.gradle")
+}
+
 group = "instaroom"
 version = "0.0.1"
 
