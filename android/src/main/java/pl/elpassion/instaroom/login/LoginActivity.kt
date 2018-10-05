@@ -13,8 +13,8 @@ import com.google.android.gms.tasks.Task
 import kotlinx.android.synthetic.main.login_activity.*
 import org.jetbrains.anko.startActivity
 import pl.elpassion.instaroom.DI
-import pl.elpassion.instaroom.dashboard.DashboardActivity
 import pl.elpassion.instaroom.R
+import pl.elpassion.instaroom.dashboard.DashboardActivity
 
 class LoginActivity : AppCompatActivity() {
 
@@ -40,7 +40,9 @@ class LoginActivity : AppCompatActivity() {
 
         model = ViewModelProviders.of(this, LoginViewModelFactory(DI.provideLoginRepository()))
             .get(LoginViewModel::class.java)
-        model.getGoogleToken().observe(this, Observer { showRoomsScreen() })
+        model.getGoogleToken().observe(this, Observer { token ->
+            if (token != null) showRoomsScreen()
+        })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

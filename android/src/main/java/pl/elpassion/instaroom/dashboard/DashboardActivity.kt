@@ -7,11 +7,25 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet.CHAIN_PACKED
 import androidx.constraintlayout.widget.ConstraintSet.PARENT_ID
 import androidx.lifecycle.ViewModelProviders
-import org.jetbrains.anko.*
-import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.*
+import org.jetbrains.anko.backgroundResource
+import org.jetbrains.anko.button
+import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.BASELINE
+import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.BOTTOM
+import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.END
+import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.START
+import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.TOP
 import org.jetbrains.anko.constraint.layout.applyConstraintSet
 import org.jetbrains.anko.constraint.layout.constraintLayout
 import org.jetbrains.anko.constraint.layout.guideline
+import org.jetbrains.anko.dimen
+import org.jetbrains.anko.dip
+import org.jetbrains.anko.imageView
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.padding
+import org.jetbrains.anko.textColor
+import org.jetbrains.anko.textView
+import org.jetbrains.anko.view
+import org.jetbrains.anko.wrapContent
 import pl.elpassion.instaroom.DI
 import pl.elpassion.instaroom.R
 
