@@ -1,1 +1,4 @@
-include ':backend', ':android'
+include ':backend'
+if (INCLUDE_ANDROID == "true") {
+    include ':android'
+}
