@@ -1,4 +1,4 @@
-package pl.elpassion.instaroom
+package pl.elpassion.instaroom.login
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,14 +6,20 @@ import android.util.Log
 import android.widget.Toast.LENGTH_LONG
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.toast
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import kotlinx.android.synthetic.main.login_activity.*
+import pl.elpassion.instaroom.DI
+import pl.elpassion.instaroom.R
 
 class LoginActivity : AppCompatActivity() {
+
+    private lateinit var model: LoginViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,8 +33,15 @@ class LoginActivity : AppCompatActivity() {
         val googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions)
 
         signInButton.setOnClickListener {
-            startActivityForResult(googleSignInClient.signInIntent, SIGN_IN_REQUEST_CODE)
+            startActivityForResult(
+                googleSignInClient.signInIntent,
+                SIGN_IN_REQUEST_CODE
+            )
         }
+
+        model = ViewModelProviders.of(this, LoginViewModelFactory(DI.provideLoginRepository()))
+            .get(LoginViewModel::class.java)
+        model.getGoogleToken().observe(this, Observer { toast("Token: $it") })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
