@@ -15,6 +15,8 @@ import pl.elpassion.instaroom.api.Room
 
 class DashboardActivity : AppCompatActivity() {
 
+    private val rooms = mutableListOf<Room>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
@@ -22,21 +24,26 @@ class DashboardActivity : AppCompatActivity() {
             this,
             DashboardViewModelFactory(DI.provideInstaRoomApi(), DI.provideLoginRepository())
         ).get(DashboardViewModel::class.java)
-        model.getRooms().observe(this, Observer { toast("$it") })
+        model.getRooms().observe(this, Observer(::updateRooms))
         model.getError().observe(this, Observer { toast(it) })
 
         setUpList()
     }
 
     private fun setUpList() {
-        val mockList = listOf(Room(""), Room(""), Room(""))
-        dashboard_recycler_view.adapter = basicAdapterWithLayoutAndBinder(mockList, R.layout.item_room) { holder, item ->
-//            holder.itemView.item_room_meeting_title_tv.text = item.name
+        dashboard_recycler_view.adapter = basicAdapterWithLayoutAndBinder(rooms, R.layout.item_room) { holder, item ->
+            holder.itemView.item_room_name_tv.text = item.name
+            holder.itemView.item_room_meeting_title_tv.text = item.events.firstOrNull()?.name
             holder.itemView.setOnClickListener {
                 onRoomClicked(item)
             }
         }
         dashboard_recycler_view.layoutManager = LinearLayoutManager(this)
+    }
+
+    private fun updateRooms(rooms: List<Room>) {
+        this.rooms.run { clear(); addAll(rooms) }
+        dashboard_recycler_view.adapter?.notifyDataSetChanged()
     }
 
     fun onRoomClicked(room: Room) {

@@ -15,5 +15,5 @@ object RetrofitInstaRoomApi : InstaRoomApi {
 
     private val service = retrofit.create(InstaRoomApi::class.java)
 
-    override fun getRooms(accessToken: String): Deferred<List<Room>> = service.getRooms(accessToken)
+    override fun getRooms(accessToken: String): Deferred<RoomsResponse> = service.getRooms(accessToken)
 }

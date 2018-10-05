@@ -7,5 +7,5 @@ import retrofit2.http.Header
 interface InstaRoomApi {
 
     @GET("/rooms")
-    fun getRooms(@Header("AccessToken") accessToken: String): Deferred<List<Room>>
+    fun getRooms(@Header("AccessToken") accessToken: String): Deferred<RoomsResponse>
 }

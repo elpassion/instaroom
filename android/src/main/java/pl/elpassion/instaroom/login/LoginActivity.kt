@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.google.android.gms.auth.GoogleAuthUtil
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -12,6 +13,10 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.Scope
 import com.google.android.gms.tasks.Task
 import kotlinx.android.synthetic.main.login_activity.*
+import kotlinx.coroutines.experimental.Dispatchers
+import kotlinx.coroutines.experimental.GlobalScope
+import kotlinx.coroutines.experimental.IO
+import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.startActivity
 import pl.elpassion.instaroom.DI
 import pl.elpassion.instaroom.R
@@ -57,8 +62,16 @@ class LoginActivity : AppCompatActivity() {
 
     private fun handleSignInResult(task: Task<GoogleSignInAccount>) {
         try {
-            task.getResult(ApiException::class.java)?.idToken?.let(model::saveGoogleToken)
-        } catch (e: ApiException) {
+            val result = task.getResult(ApiException::class.java)
+            GlobalScope.launch(Dispatchers.IO) {
+                val token = GoogleAuthUtil.getToken(
+                    this@LoginActivity,
+                    result!!.account,
+                    "oauth2:https://www.googleapis.com/auth/calendar.events"
+                )
+                model.saveGoogleToken(token)
+            }
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }

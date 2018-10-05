@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.experimental.CoroutineScope
 import kotlinx.coroutines.experimental.Dispatchers
+import kotlinx.coroutines.experimental.IO
 import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.launch
 import pl.elpassion.instaroom.api.InstaRoomApi
@@ -27,11 +28,11 @@ class DashboardViewModel(
     private val job = Job()
 
     init {
-        launch {
+        launch(Dispatchers.IO) {
             try {
                 val accessToken = loginRepository.googleToken!!
-                val rooms = instaRoomApi.getRooms(accessToken).await()
-                roomsLiveData.postValue(rooms)
+                val response = instaRoomApi.getRooms(accessToken).await()
+                roomsLiveData.postValue(response.rooms)
             } catch (e: HttpException) {
                 errorLiveData.postValue(e.message())
             }
