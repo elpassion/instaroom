@@ -7,6 +7,7 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.client.util.DateTime
 import com.google.api.services.calendar.Calendar
+import freemarker.cache.ClassTemplateLoader
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
@@ -18,6 +19,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.origin
+import io.ktor.freemarker.*
 import io.ktor.html.respondHtml
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
@@ -66,10 +68,19 @@ fun Application.module(testing: Boolean = false) {
         }
     }
 
+    install(FreeMarker) {
+        templateLoader = ClassTemplateLoader(Application::class.java.classLoader, "templates")
+    }
+
     val client = HttpClient(Apache) {
     }
 
     routing {
+        get("/template") {
+            val user = "user name"
+            call.respond(FreeMarkerContent("index.ftl", mapOf("user" to user), "e"))
+        }
+
         get("/") {
 
             val accessToken = call.sessions.get<MySession>()?.accessToken
@@ -121,20 +132,6 @@ fun Application.module(testing: Boolean = false) {
                             li { +"$n" }
                         }
                     }
-                }
-            }
-        }
-
-        get("/styles.css") {
-            call.respondCss {
-                body {
-                    backgroundColor = Color.red
-                }
-                p {
-                    fontSize = 2.em
-                }
-                rule("p.myclass") {
-                    color = Color.blue
                 }
             }
         }
