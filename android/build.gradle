@@ -15,6 +15,12 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     }
+    
+    signingConfigs {
+        debug {
+            storeFile file("src/debug/debug.keystore")
+        }
+    }
 
     buildTypes {
         release {
