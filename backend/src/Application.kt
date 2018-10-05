@@ -30,6 +30,7 @@ import io.ktor.routing.routing
 import io.ktor.sessions.*
 import kotlinx.css.*
 import kotlinx.html.*
+import java.io.IOException
 import kotlin.collections.set
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.DevelopmentEngine.main(args)
@@ -183,20 +184,40 @@ private val transport = GoogleNetHttpTransport.newTrustedTransport()
 
 private val jsonFactory = JacksonFactory.getDefaultInstance()
 
+private val idSalkaPrzyDeveloperach = "elpassion.pl_2d3431363530383233373435@resource.calendar.google.com"
+private val idSalkaPrzyRecepcji = "elpassion.pl_3336373234343038393630@resource.calendar.google.com"
+private val idSalkaZielona = "elpassion.pl_36303736393039313938@resource.calendar.google.com"
+private val idSalkaZolta = "elpassion.pl_2d3837303539373033363132@resource.calendar.google.com"
+private val idSalkaPrzyGrafikach = "elpassion.pl_34313639343833323536@resource.calendar.google.com"
+
 private fun calendarStuff(token: String): List<String> {
 
     val credential = Credential(BearerToken.authorizationHeaderAccessMethod()).setAccessToken(token)
 
-    val calendar = Calendar.Builder(transport, jsonFactory, credential).build()
+    val service = Calendar.Builder(transport, jsonFactory, credential)
+        .setApplicationName("Instaroom")
+        .build()
 
-    val now = DateTime(System.currentTimeMillis())
 
-    val events = calendar.events().list("primary")
+    val results = try {
+        listOf("Salka przy developerach") + getSomeEvents(service, idSalkaPrzyDeveloperach) +
+                listOf("Salka przy recepcji") + getSomeEvents(service, idSalkaPrzyRecepcji) +
+                listOf("Salka zielona") + getSomeEvents(service, idSalkaZielona) +
+                listOf("Salka zolta") + getSomeEvents(service, idSalkaZolta) +
+                listOf("Salka przy grafikach") + getSomeEvents(service, idSalkaPrzyGrafikach)
+    } catch (e: Exception) {
+        listOf("Blad dostepu do salek: $e")
+    }
+
+    return results
+}
+
+private fun getSomeEvents(service: Calendar, calendarId: String) =
+    service.events().list(calendarId)
         .setMaxResults(10)
-        .setTimeMin(now)
+        .setTimeMin(DateTime(System.currentTimeMillis()))
         .setOrderBy("startTime")
         .setSingleEvents(true)
         .execute()
-
-    return events.items.map { "${it.summary} (${it.start.dateTime ?: it.start.date})" }
-}
+        .items
+        .map { "${it.summary} (${it.start.dateTime ?: it.start.date})" }
