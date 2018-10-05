@@ -1,5 +1,11 @@
 package pl.elpassion.instaroom
 
+import com.google.api.client.auth.oauth2.BearerToken
+import com.google.api.client.auth.oauth2.Credential
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
+import com.google.api.client.json.jackson2.JacksonFactory
+import com.google.api.client.util.DateTime
+import com.google.api.services.calendar.Calendar
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
@@ -24,6 +30,7 @@ import io.ktor.routing.routing
 import io.ktor.sessions.*
 import kotlinx.css.*
 import kotlinx.html.*
+import java.io.IOException
 import kotlin.collections.set
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.DevelopmentEngine.main(args)
@@ -50,7 +57,31 @@ fun Application.module(testing: Boolean = false) {
 
     routing {
         get("/") {
-            call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
+
+            val accessToken = call.sessions.get<MySession>()?.accessToken
+
+            if (accessToken === null) {
+                call.respondHtml {
+                    body {
+                        h2 { +"Unknown user" }
+                        h2 { a("/login") { +"Login" } }
+                    }
+                }
+            } else {
+                val stuff = calendarStuff(accessToken)
+
+                call.respondHtml {
+                    body {
+                        h2 { +"Hi user" }
+                        ul {
+                            for (event in stuff) {
+                                li { h4 { +event } }
+                            }
+                        }
+                        h2 { a("/login") { +"Login again" } }
+                    }
+                }
+            }
         }
 
         get("/html-dsl") {
@@ -85,12 +116,6 @@ fun Application.module(testing: Boolean = false) {
             resources("static")
         }
 
-        get("/session/increment") {
-            val session = call.sessions.get<MySession>() ?: MySession()
-            call.sessions.set(session.copy(count = session.count + 1))
-            call.respondText("Counter is ${session.count}. Refresh to increment.")
-        }
-
         authenticate("google-oauth") {
             route("/login") {
                 handle {
@@ -99,22 +124,28 @@ fun Application.module(testing: Boolean = false) {
 
                     val accessToken = principal.accessToken
 
+                    call.sessions.set(MySession(accessToken))
+
                     val json = HttpClient(Apache).get<String>("https://www.googleapis.com/userinfo/v2/me") {
                         header("Authorization", "Bearer $accessToken")
                     }
 
                     println(json)
 
-                    call.respondText(json)
+                    call.respondHtml {
+                        body {
+                            h2 { +"User details" }
+                            code { +json }
+                            h2 { a("/") { +"Go back to calendar" } }
+                        }
+                    }
                 }
-
             }
-
         }
     }
 }
 
-data class MySession(val count: Int = 0)
+data class MySession(val accessToken: String)
 
 fun FlowOrMetaDataContent.styleCss(builder: CSSBuilder.() -> Unit) {
     style(type = ContentType.Text.CSS.toString()) {
@@ -136,8 +167,8 @@ val googleOauthProvider = OAuthServerSettings.OAuth2ServerSettings(
     accessTokenUrl = "https://www.googleapis.com/oauth2/v3/token",
     requestMethod = HttpMethod.Post,
 
-    clientId = "todo some client id",
-    clientSecret = "todo some client secret",
+    clientId = System.getenv("INSTAROOM_WEB_CLIENT_ID"),
+    clientSecret = System.getenv("INSTAROOM_WEB_CLIENT_SECRET"),
     defaultScopes = listOf("profile", "https://www.googleapis.com/auth/calendar.events")
 )
 
@@ -147,3 +178,46 @@ private fun ApplicationCall.redirectUrl(path: String): String {
     val protocol = request.origin.scheme
     return "$protocol://$hostPort$path"
 }
+
+
+private val transport = GoogleNetHttpTransport.newTrustedTransport()
+
+private val jsonFactory = JacksonFactory.getDefaultInstance()
+
+private val idSalkaPrzyDeveloperach = "elpassion.pl_2d3431363530383233373435@resource.calendar.google.com"
+private val idSalkaPrzyRecepcji = "elpassion.pl_3336373234343038393630@resource.calendar.google.com"
+private val idSalkaZielona = "elpassion.pl_36303736393039313938@resource.calendar.google.com"
+private val idSalkaZolta = "elpassion.pl_2d3837303539373033363132@resource.calendar.google.com"
+private val idSalkaPrzyGrafikach = "elpassion.pl_34313639343833323536@resource.calendar.google.com"
+
+private fun calendarStuff(token: String): List<String> {
+
+    val credential = Credential(BearerToken.authorizationHeaderAccessMethod()).setAccessToken(token)
+
+    val service = Calendar.Builder(transport, jsonFactory, credential)
+        .setApplicationName("Instaroom")
+        .build()
+
+
+    val results = try {
+        listOf("Salka przy developerach") + getSomeEvents(service, idSalkaPrzyDeveloperach) +
+                listOf("Salka przy recepcji") + getSomeEvents(service, idSalkaPrzyRecepcji) +
+                listOf("Salka zielona") + getSomeEvents(service, idSalkaZielona) +
+                listOf("Salka zolta") + getSomeEvents(service, idSalkaZolta) +
+                listOf("Salka przy grafikach") + getSomeEvents(service, idSalkaPrzyGrafikach)
+    } catch (e: Exception) {
+        listOf("Blad dostepu do salek: $e")
+    }
+
+    return results
+}
+
+private fun getSomeEvents(service: Calendar, calendarId: String) =
+    service.events().list(calendarId)
+        .setMaxResults(10)
+        .setTimeMin(DateTime(System.currentTimeMillis()))
+        .setOrderBy("startTime")
+        .setSingleEvents(true)
+        .execute()
+        .items
+        .map { "${it.summary} (${it.start.dateTime ?: it.start.date})" }
