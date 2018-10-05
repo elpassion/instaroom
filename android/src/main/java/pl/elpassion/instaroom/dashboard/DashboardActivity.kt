@@ -6,11 +6,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet.CHAIN_PACKED
 import androidx.constraintlayout.widget.ConstraintSet.PARENT_ID
+import androidx.lifecycle.ViewModelProviders
 import org.jetbrains.anko.*
 import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.*
 import org.jetbrains.anko.constraint.layout.applyConstraintSet
 import org.jetbrains.anko.constraint.layout.constraintLayout
 import org.jetbrains.anko.constraint.layout.guideline
+import pl.elpassion.instaroom.DI
 import pl.elpassion.instaroom.R
 
 class DashboardActivity : AppCompatActivity() {
@@ -295,6 +297,8 @@ class DashboardActivity : AppCompatActivity() {
                 }
             }
         })
+        val model = ViewModelProviders.of(this, DashboardViewModelFactory(DI.provideInstaRoomApi()))
+            .get(DashboardViewModel::class.java)
     }
 
     private object Ids {
