@@ -136,10 +136,17 @@ fun Application.module(testing: Boolean = false) {
         }
 
         post("/book") {
-            call.respondHtml {
-                body {
-                    h2 { +"TODO" }
-                }
+            val accessToken = call.request.headers["AccessToken"]
+            val calendarId = call.request.headers["CalendarId"]
+            if (accessToken === null) {
+                call.respond(HttpStatusCode.Unauthorized, "No access token provided")
+            }
+            else if (calendarId == null) {
+                call.respond(HttpStatusCode.ExpectationFailed, "No calendar id provided")
+            }
+            else {
+                val result = bookSomeRoom(accessToken, calendarId)
+                call.respond(result)
             }
         }
 
@@ -257,6 +264,27 @@ private fun calendarStuff(token: String): List<String> {
     return results
 }
 
+private fun bookSomeRoom(accessToken: String, calendarId: String): String {
+    val credential = Credential(BearerToken.authorizationHeaderAccessMethod()).setAccessToken(accessToken)
+
+    val service = Calendar.Builder(transport, jsonFactory, credential)
+        .setApplicationName("Instaroom")
+        .build()
+
+    return try {
+        service.bookSomeRoom(calendarId)
+    }
+    catch (e: Exception) {
+        "Blad bookowania salki $e"
+    }
+
+}
+
+private fun Calendar.bookSomeRoom(calendarId: String): String {
+    events().quickAdd(calendarId, "ZAJETE").execute()
+    return "OK"
+}
+
 private fun getSomeRooms(accessToken: String): List<Room> {
     val credential = Credential(BearerToken.authorizationHeaderAccessMethod()).setAccessToken(accessToken)
 
@@ -289,5 +317,4 @@ private fun Calendar.getSomeEvents(calendarId: String) =
         .map { Event(it.summary, it.start.dateTime.toString(), it.end.dateTime.toString()) }
 
 private fun Calendar.getSomeEventsStrings(calendarId: String) =
-    getSomeEvents(calendarId)
-        .map { "${it.name} (${it.startTime} - ${it.endTime})" }
+    getSomeEvents(calendarId).map { "${it.name} (${it.startTime} - ${it.endTime})" } + listOf("and the calendar id is: $calendarId")
