@@ -9,6 +9,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.Scope
 import com.google.android.gms.tasks.Task
 import kotlinx.android.synthetic.main.login_activity.*
 import org.jetbrains.anko.startActivity
@@ -27,6 +28,7 @@ class LoginActivity : AppCompatActivity() {
         val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.server_client_id))
             .requestEmail()
+            .requestScopes(Scope("https://www.googleapis.com/auth/calendar.events"))
             .build()
 
         val googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions)
