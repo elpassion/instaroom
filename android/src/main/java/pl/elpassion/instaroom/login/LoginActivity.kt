@@ -11,7 +11,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import kotlinx.android.synthetic.main.login_activity.*
+import org.jetbrains.anko.startActivity
 import pl.elpassion.instaroom.DI
+import pl.elpassion.instaroom.dashboard.DashboardActivity
 import pl.elpassion.instaroom.R
 
 class LoginActivity : AppCompatActivity() {
@@ -57,9 +59,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun showRoomsScreen() {
-        //TODO: show RoomsActivity
-    }
+    private fun showRoomsScreen() = startActivity<DashboardActivity>()
 
     companion object {
         const val SIGN_IN_REQUEST_CODE = 627

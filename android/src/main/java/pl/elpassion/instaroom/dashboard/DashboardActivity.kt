@@ -1,19 +1,14 @@
-package pl.elpassion.instaroom
+package pl.elpassion.instaroom.dashboard
 
-import android.app.*
-import android.view.*
-import android.widget.*
-import org.jetbrains.anko.*
 import android.os.Bundle
-import android.support.constraint.ConstraintLayout
-import android.support.constraint.ConstraintSet.CHAIN_PACKED
-import android.support.constraint.ConstraintSet.PARENT_ID
-import android.support.v7.app.AppCompatActivity
-import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet.CHAIN_PACKED
+import androidx.constraintlayout.widget.ConstraintSet.PARENT_ID
+import org.jetbrains.anko.*
 import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.*
-import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.ViewSide.*
 import org.jetbrains.anko.constraint.layout.applyConstraintSet
-
 import org.jetbrains.anko.constraint.layout.constraintLayout
 import org.jetbrains.anko.constraint.layout.guideline
 import pl.elpassion.instaroom.R
@@ -22,14 +17,12 @@ class DashboardActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        constraintLayout {
+        setContentView(constraintLayout {
             setTheme(R.style.ItemRoomStyle)
             val itemRoomNameTv = textView {
                 backgroundResource = R.color.colorPrimary
                 id = Ids.item_room_name_tv
-                setPadding(R.dimen.medium_padding, dip(10), R.dimen.medium_padding, dip(10))
+                setPadding(dimen(R.dimen.medium_padding), dip(10), dimen(R.dimen.medium_padding), dip(10))
                 textColor = android.R.color.white
                 textSize = 12f
             }.lparams(width = matchParent, height = wrapContent)
@@ -39,7 +32,7 @@ class DashboardActivity : AppCompatActivity() {
             }.lparams(width = matchParent, height = dip(0))
             val itemRoomFreeIconIv = imageView(R.drawable.ic_android) {
                 backgroundResource = R.drawable.round
-                setBackgroundColor(R.color.blueDark)
+                setBackgroundColor(getColor(R.color.blueDark))
                 id = Ids.item_room_free_icon_iv
                 padding = dip(8)
                 visibility = View.INVISIBLE
@@ -72,7 +65,7 @@ class DashboardActivity : AppCompatActivity() {
             }.lparams(width = wrapContent, height = wrapContent)
             val itemRoomMeetingCalendarIcon = imageView(R.drawable.ic_android) {
                 backgroundResource = R.drawable.round
-                setBackgroundColor(android.R.color.white)
+                setBackgroundColor(getColor(android.R.color.white))
                 padding = dip(10)
             }.lparams(width = dip(46), height = dip(46))
             val itemRoomLineV = view {
@@ -119,8 +112,8 @@ class DashboardActivity : AppCompatActivity() {
             }.lparams(width = wrapContent, height = wrapContent)
             val itemRoomStatusDescTv = textView {
                 id = Ids.item_room_status_desc_tv
-                setPadding(0, R.dimen.basic_padding, 0, R.dimen.basic_padding)
-                setPadding(0, R.dimen.basic_padding, 0, R.dimen.basic_padding)
+                setPadding(0, dimen(R.dimen.basic_padding), 0, dimen(R.dimen.basic_padding))
+                setPadding(0, dimen(R.dimen.basic_padding), 0, dimen(R.dimen.basic_padding))
                 textColor = android.R.color.white
             }.lparams(width = wrapContent, height = wrapContent)
             val itemRoomBookButton = button {
@@ -128,180 +121,180 @@ class DashboardActivity : AppCompatActivity() {
             }.lparams(width = wrapContent, height = wrapContent)
             guideline {
                 id = Ids.item_room_guideline_start
-            }.lparams(width = wrapContent, height = matchParent){
+            }.lparams(width = wrapContent, height = matchParent) {
                 orientation = ConstraintLayout.LayoutParams.VERTICAL
                 guideBegin = R.dimen.medium_padding
             }
             guideline {
                 id = Ids.item_room_guideline_end
-            }.lparams(width = wrapContent, height = matchParent){
+            }.lparams(width = wrapContent, height = matchParent) {
                 orientation = ConstraintLayout.LayoutParams.VERTICAL
                 guideEnd = R.dimen.medium_padding
             }
             applyConstraintSet {
                 itemRoomMeetingView {
                     connect(
-                            BOTTOM to TOP of R.id.item_room_line_v,
-                            TOP to BOTTOM of R.id.item_room_name_tv
+                        BOTTOM to TOP of R.id.item_room_line_v,
+                        TOP to BOTTOM of R.id.item_room_name_tv
                     )
                 }
                 itemRoomFreeIconIv {
                     connect(
-                            BOTTOM to TOP of R.id.item_room_free_tv,
-                            END to END of PARENT_ID,
-                            START to START of PARENT_ID,
-                            TOP to BOTTOM of R.id.item_room_name_tv
+                        BOTTOM to TOP of R.id.item_room_free_tv,
+                        END to END of PARENT_ID,
+                        START to START of PARENT_ID,
+                        TOP to BOTTOM of R.id.item_room_name_tv
                     )
                 }
                 itemRoomFreeTv {
                     connect(
-                            BOTTOM to BOTTOM of R.id.item_room_meeting_v,
-                            END to END of R.id.item_room_free_icon_iv,
-                            START to START of R.id.item_room_free_icon_iv,
-                            TOP to BOTTOM of R.id.item_room_free_icon_iv
+                        BOTTOM to BOTTOM of R.id.item_room_meeting_v,
+                        END to END of R.id.item_room_free_icon_iv,
+                        START to START of R.id.item_room_free_icon_iv,
+                        TOP to BOTTOM of R.id.item_room_free_icon_iv
                     )
                 }
                 itemRoomMeetingTitleTv {
                     connect(
-                            BOTTOM to TOP of R.id.item_room_meeting_time_start_tv,
-                            START to START of R.id.item_room_guideline_start,
-                            TOP to BOTTOM of R.id.item_room_name_tv
-                            )
+                        BOTTOM to TOP of R.id.item_room_meeting_time_start_tv,
+                        START to START of R.id.item_room_guideline_start,
+                        TOP to BOTTOM of R.id.item_room_name_tv
+                    )
                     verticalChainStyle = CHAIN_PACKED
                 }
                 itemRoomMeetingTimeStartTv {
                     connect(
-                            BOTTOM to BOTTOM of R.id.item_room_line_v,
-                            START to START of R.id.item_room_guideline_start,
-                            TOP to BOTTOM of R.id.item_room_meeting_title_tv
+                        BOTTOM to BOTTOM of R.id.item_room_line_v,
+                        START to START of R.id.item_room_guideline_start,
+                        TOP to BOTTOM of R.id.item_room_meeting_title_tv
                     )
                 }
                 itemRoomMeetingTimeStartUnitTv {
                     connect(
-                            BOTTOM to BOTTOM of R.id.item_room_meeting_time_start_tv,
-                            START to END of R.id.item_room_meeting_time_start_tv
+                        BOTTOM to BOTTOM of R.id.item_room_meeting_time_start_tv,
+                        START to END of R.id.item_room_meeting_time_start_tv
                     )
                 }
                 itemRoomMeetingTimeSeparator {
                     connect(
-                            BOTTOM to BOTTOM of R.id.item_room_meeting_time_start_tv,
-                            START to END of R.id.item_room_meeting_time_start_unit_tv,
-                            TOP to TOP of R.id.item_room_meeting_time_start_tv
+                        BOTTOM to BOTTOM of R.id.item_room_meeting_time_start_tv,
+                        START to END of R.id.item_room_meeting_time_start_unit_tv,
+                        TOP to TOP of R.id.item_room_meeting_time_start_tv
                     )
                 }
                 itemRoomMeetingTimeEndTv {
                     connect(
-                            BASELINE to BASELINE of R.id.item_room_meeting_time_start_tv,
-                            START to END of R.id.item_room_meeting_time_separator
+                        BASELINE to BASELINE of R.id.item_room_meeting_time_start_tv,
+                        START to END of R.id.item_room_meeting_time_separator
                     )
                 }
                 itemRoomMeetingTimeEndUnitTv {
                     connect(
-                            BOTTOM to BOTTOM of R.id.item_room_meeting_time_start_tv,
-                            END to END of R.id.item_room_guideline_end,
-                            TOP to TOP of R.id.item_room_meeting_title_tv
+                        BOTTOM to BOTTOM of R.id.item_room_meeting_time_start_tv,
+                        END to END of R.id.item_room_guideline_end,
+                        TOP to TOP of R.id.item_room_meeting_title_tv
                     )
                 }
 
                 itemRoomMeetingCalendarIcon {
                     connect(
-                            BOTTOM to BOTTOM of R.id.item_room_meeting_time_start_tv,
-                            END to END of R.id.item_room_guideline_end,
-                            TOP to TOP of R.id.item_room_meeting_title_tv
+                        BOTTOM to BOTTOM of R.id.item_room_meeting_time_start_tv,
+                        END to END of R.id.item_room_guideline_end,
+                        TOP to TOP of R.id.item_room_meeting_title_tv
                     )
                 }
 
                 itemRoomLineV {
                     connect(
-                            TOP to BOTTOM of R.id.item_room_meeting_v
+                        TOP to BOTTOM of R.id.item_room_meeting_v
                     )
                 }
                 con {
                     connect(
-                            BOTTOM to TOP of R.id.item_room_status_desc_tv,
-                            TOP to BOTTOM of R.id.item_room_line_v
+                        BOTTOM to TOP of R.id.item_room_status_desc_tv,
+                        TOP to BOTTOM of R.id.item_room_line_v
                     )
                 }
                 itemRoomArrowIconIv {
                     connect(
-                            BOTTOM to BOTTOM of R.id.item_room_time_start_tv,
-                            START to START of R.id.item_room_guideline_start,
-                            TOP to BOTTOM of R.id.item_room_line_v,
-                            TOP to TOP of R.id.item_room_time_start_tv
+                        BOTTOM to BOTTOM of R.id.item_room_time_start_tv,
+                        START to START of R.id.item_room_guideline_start,
+                        TOP to BOTTOM of R.id.item_room_line_v,
+                        TOP to TOP of R.id.item_room_time_start_tv
                     )
                 }
                 itemRoomTimeStartTv {
                     connect(
-                            START to END of R.id.item_room_arrow_icon_iv,
-                            TOP to BOTTOM of R.id.item_room_line_v
+                        START to END of R.id.item_room_arrow_icon_iv,
+                        TOP to BOTTOM of R.id.item_room_line_v
                     )
                 }
                 itemRoomTimeStartUnitTv {
                     connect(
-                            BASELINE to BASELINE of R.id.item_room_time_start_tv,
-                            START to END of R.id.item_room_time_start_tv,
-                            TOP to TOP of R.id.item_room_time_start_tv
+                        BASELINE to BASELINE of R.id.item_room_time_start_tv,
+                        START to END of R.id.item_room_time_start_tv,
+                        TOP to TOP of R.id.item_room_time_start_tv
                     )
                 }
                 itemRoomTimeRangeIconIv {
                     connect(
-                            BOTTOM to BOTTOM of R.id.item_room_time_start_tv,
-                            START to END of R.id.item_room_time_start_unit_tv,
-                            TOP to TOP of R.id.item_room_time_start_tv
+                        BOTTOM to BOTTOM of R.id.item_room_time_start_tv,
+                        START to END of R.id.item_room_time_start_unit_tv,
+                        TOP to TOP of R.id.item_room_time_start_tv
                     )
                 }
                 itemRoomTimeEndTv {
                     connect(
-                            START to END of R.id.item_room_time_range_icon_iv,
-                            TOP to BOTTOM of R.id.item_room_line_v
+                        START to END of R.id.item_room_time_range_icon_iv,
+                        TOP to BOTTOM of R.id.item_room_line_v
                     )
                 }
                 itemRoomTimeEndUnitTv {
                     connect(
-                            BOTTOM to BOTTOM of R.id.item_room_time_end_tv,
-                            START to END of R.id.item_room_time_end_tv,
-                            TOP to TOP of R.id.item_room_time_end_tv
+                        BOTTOM to BOTTOM of R.id.item_room_time_end_tv,
+                        START to END of R.id.item_room_time_end_tv,
+                        TOP to TOP of R.id.item_room_time_end_tv
                     )
                 }
                 itemRoomNextMeetingTitleSeparator {
                     connect(
-                            BOTTOM to BOTTOM of R.id.item_room_time_start_tv,
-                            START to END of R.id.item_room_time_end_unit_tv,
-                            TOP to TOP of R.id.item_room_time_start_tv
+                        BOTTOM to BOTTOM of R.id.item_room_time_start_tv,
+                        START to END of R.id.item_room_time_end_unit_tv,
+                        TOP to TOP of R.id.item_room_time_start_tv
                     )
                 }
                 itemRoomNextMeetingTitleTv {
                     connect(
-                            BASELINE to BASELINE of R.id.item_room_time_start_tv,
-                            START to END of R.id.item_room_next_meeting_title_separator
+                        BASELINE to BASELINE of R.id.item_room_time_start_tv,
+                        START to END of R.id.item_room_next_meeting_title_separator
                     )
                 }
                 con2 {
                     connect(
-                            BOTTOM to BOTTOM of R.id.item_room_status_desc_tv,
-                            TOP to TOP of R.id.item_room_status_desc_tv
+                        BOTTOM to BOTTOM of R.id.item_room_status_desc_tv,
+                        TOP to TOP of R.id.item_room_status_desc_tv
                     )
                 }
                 itemRoomStatusTv {
                     connect(
-                            BOTTOM to BOTTOM of R.id.item_room_status_desc_tv,
-                            START to START of R.id.item_room_guideline_start,
-                            TOP to TOP of R.id.item_room_status_desc_tv
+                        BOTTOM to BOTTOM of R.id.item_room_status_desc_tv,
+                        START to START of R.id.item_room_guideline_start,
+                        TOP to TOP of R.id.item_room_status_desc_tv
                     )
                 }
                 itemRoomStatusDescTv {
                     connect(
-                            START to END of R.id.item_room_status_tv,
-                            TOP to BOTTOM of R.id.item_room_time_start_tv
+                        START to END of R.id.item_room_status_tv,
+                        TOP to BOTTOM of R.id.item_room_time_start_tv
                     )
                 }
                 itemRoomBookButton {
                     connect(
-                            TOP to BOTTOM of R.id.item_room_status_desc_tv
+                        TOP to BOTTOM of R.id.item_room_status_desc_tv
                     )
                 }
             }
-        }
+        })
     }
 
     private object Ids {
