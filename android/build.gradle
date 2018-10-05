@@ -47,13 +47,13 @@ dependencies {
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
     implementation "com.github.elpassion.android-commons:shared-preferences:$android_commons_version"
     implementation "com.github.elpassion.android-commons:shared-preferences-moshi-converter-adapter:$android_commons_version"
+    implementation "com.github.elpassion.android-commons:recycler:$android_commons_version"
     implementation "com.squareup.moshi:moshi-kotlin:1.7.0"
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'com.squareup.retrofit2:converter-moshi:2.4.0'
     implementation 'com.jakewharton.retrofit:retrofit2-kotlin-coroutines-experimental-adapter:1.0.0'
-
+    implementation "org.jetbrains.anko:anko-appcompat-v7:$ankoVersion"
     implementation 'com.google.android.material:material:1.0.0-beta01'
-
-    implementation "com.github.elpassion.android-commons:recycler:0.0.23"
 
     testImplementation 'junit:junit:4.12'
 
