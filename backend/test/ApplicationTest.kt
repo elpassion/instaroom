@@ -18,14 +18,14 @@ import io.ktor.client.engine.apache.*
 import kotlin.test.*
 import io.ktor.server.testing.*
 
-class ApplicationTest {
-    @Test
-    fun testRoot() {
-        withTestApplication({ module(testing = true) }) {
-            handleRequest(HttpMethod.Get, "/").apply {
-                assertEquals(HttpStatusCode.OK, response.status())
-                assertEquals("HELLO WORLD!", response.content)
-            }
-        }
-    }
-}
+//class ApplicationTest {
+//    @Test
+//    fun testRoot() {
+//        withTestApplication({ module(testing = true) }) {
+//            handleRequest(HttpMethod.Get, "/").apply {
+//                assertEquals(HttpStatusCode.OK, response.status())
+//                assertEquals("HELLO WORLD!", response.content)
+//            }
+//        }
+//    }
+//}
