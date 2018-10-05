@@ -21,6 +21,7 @@ import io.ktor.features.origin
 import io.ktor.html.respondHtml
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.resources
 import io.ktor.http.content.static
 import io.ktor.jackson.jackson
@@ -34,7 +35,6 @@ import io.ktor.routing.routing
 import io.ktor.sessions.*
 import kotlinx.css.*
 import kotlinx.html.*
-import java.io.IOException
 import kotlin.collections.set
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.DevelopmentEngine.main(args)
@@ -74,6 +74,8 @@ fun Application.module(testing: Boolean = false) {
 
             val accessToken = call.sessions.get<MySession>()?.accessToken
 
+            println("Current access token: $accessToken")
+
             if (accessToken === null) {
                 call.respondHtml {
                     body {
@@ -99,12 +101,15 @@ fun Application.module(testing: Boolean = false) {
         }
 
         get("/rooms") {
-            val data = mapOf("rooms" to listOf(
-                Room("Fake room 1", true, listOf(Event("some event", "tomorrow", "someday"))),
-                Room("Fake room 2", true, listOf(Event("some event", "tomorrow", "someday")))
-
-            ))
-            call.respond(data)
+            val accessToken = call.request.headers["AccessToken"]
+            if (accessToken === null) {
+                call.respond(HttpStatusCode.Unauthorized, "No access token provided")
+            }
+            else {
+                val rooms = getSomeRooms(accessToken)
+                val data = mapOf("rooms" to rooms)
+                call.respond(data)
+            }
         }
 
         get("/html-dsl") {
@@ -223,11 +228,11 @@ private fun calendarStuff(token: String): List<String> {
 
 
     val results = try {
-        listOf("Salka przy developerach") + getSomeEvents(service, idSalkaPrzyDeveloperach) +
-                listOf("Salka przy recepcji") + getSomeEvents(service, idSalkaPrzyRecepcji) +
-                listOf("Salka zielona") + getSomeEvents(service, idSalkaZielona) +
-                listOf("Salka zolta") + getSomeEvents(service, idSalkaZolta) +
-                listOf("Salka przy grafikach") + getSomeEvents(service, idSalkaPrzyGrafikach)
+        listOf("Salka przy developerach") + service.getSomeEventsStrings(idSalkaPrzyDeveloperach) +
+                listOf("Salka przy recepcji") + service.getSomeEventsStrings(idSalkaPrzyRecepcji) +
+                listOf("Salka zielona") + service.getSomeEventsStrings(idSalkaZielona) +
+                listOf("Salka zolta") + service.getSomeEventsStrings(idSalkaZolta) +
+                listOf("Salka przy grafikach") + service.getSomeEventsStrings(idSalkaPrzyGrafikach)
     } catch (e: Exception) {
         listOf("Blad dostepu do salek: $e")
     }
@@ -235,12 +240,37 @@ private fun calendarStuff(token: String): List<String> {
     return results
 }
 
-private fun getSomeEvents(service: Calendar, calendarId: String) =
-    service.events().list(calendarId)
+private fun getSomeRooms(accessToken: String): List<Room> {
+    val credential = Credential(BearerToken.authorizationHeaderAccessMethod()).setAccessToken(accessToken)
+
+    val service = Calendar.Builder(transport, jsonFactory, credential)
+        .setApplicationName("Instaroom")
+        .build()
+
+    return service.getSomeRooms()
+}
+
+private fun Calendar.getSomeRooms() = listOf(
+    getRoom("Salka przy deweloperach", idSalkaPrzyDeveloperach),
+    getRoom("Salka przy recepcji", idSalkaPrzyRecepcji),
+    getRoom("Salka zielona", idSalkaZielona),
+    getRoom("Salka zolta", idSalkaZolta),
+    getRoom("Salka przy grafikach", idSalkaPrzyGrafikach)
+)
+
+private fun Calendar.getRoom(name: String, calendarId: String) =
+    Room(name, true, getSomeEvents(calendarId)) // TODO: isFreeNow support
+
+private fun Calendar.getSomeEvents(calendarId: String) =
+    events().list(calendarId)
         .setMaxResults(10)
         .setTimeMin(DateTime(System.currentTimeMillis()))
         .setOrderBy("startTime")
         .setSingleEvents(true)
         .execute()
         .items
-        .map { "${it.summary} (${it.start.dateTime ?: it.start.date})" }
+        .map { Event(it.summary, it.start.dateTime.toString(), it.end.dateTime.toString()) }
+
+private fun Calendar.getSomeEventsStrings(calendarId: String) =
+    getSomeEvents(calendarId)
+        .map { "${it.name} (${it.startTime} - ${it.endTime})" }
