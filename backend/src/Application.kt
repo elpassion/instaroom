@@ -1,5 +1,6 @@
 package pl.elpassion.instaroom
 
+import com.fasterxml.jackson.databind.SerializationFeature
 import com.google.api.client.auth.oauth2.BearerToken
 import com.google.api.client.auth.oauth2.Credential
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
@@ -15,14 +16,17 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.apache.Apache
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.features.ContentNegotiation
 import io.ktor.features.origin
 import io.ktor.html.respondHtml
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.http.content.resources
 import io.ktor.http.content.static
+import io.ktor.jackson.jackson
 import io.ktor.request.host
 import io.ktor.request.port
+import io.ktor.response.respond
 import io.ktor.response.respondText
 import io.ktor.routing.get
 import io.ktor.routing.route
@@ -35,12 +39,22 @@ import kotlin.collections.set
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.DevelopmentEngine.main(args)
 
+data class Event(val name: String, val startTime: String, val endTime: String)
+
+data class Room(val name: String, val isFreeNow: Boolean, val events: List<Event>)
+
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
     install(Sessions) {
         cookie<MySession>("MY_SESSION") {
             cookie.extensions["SameSite"] = "lax"
+        }
+    }
+
+    install(ContentNegotiation) {
+        jackson {
+            enable(SerializationFeature.INDENT_OUTPUT)
         }
     }
 
@@ -82,6 +96,15 @@ fun Application.module(testing: Boolean = false) {
                     }
                 }
             }
+        }
+
+        get("/rooms") {
+            val data = mapOf("rooms" to listOf(
+                Room("Fake room 1", true, listOf(Event("some event", "tomorrow", "someday"))),
+                Room("Fake room 2", true, listOf(Event("some event", "tomorrow", "someday")))
+
+            ))
+            call.respond(data)
         }
 
         get("/html-dsl") {
