@@ -42,6 +42,7 @@ dependencies {
     compile("io.ktor:ktor-client-core-jvm:$ktor_version")
     compile("io.ktor:ktor-client-apache:$ktor_version")
     compile("io.ktor:ktor-jackson:$ktor_version")
+    compile("io.ktor:ktor-freemarker:$ktor_version")
     compile("com.google.apis:google-api-services-calendar:v3-rev305-1.23.0")
     testCompile("io.ktor:ktor-server-tests:$ktor_version")
     testCompile("io.ktor:ktor-client-mock:$ktor_version")
