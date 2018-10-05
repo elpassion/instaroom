@@ -104,28 +104,10 @@ fun Application.module(testing: Boolean = false) {
             println("Current access token: $accessToken")
 
             if (accessToken === null) {
-                call.respondHtml {
-                    body {
-                        h2 { +"Unknown user" }
-                        h2 { a("/login") { +"Login" } }
-                    }
-                }
+                call.respond(FreeMarkerContent("home.ftl",mapOf("user" to ""), "e"))
             } else {
                 val stuff = calendarStuff(accessToken)
-
-                call.respondHtml {
-                    body {
-                        h2 { +"Hi user" }
-                        h3 { +accessToken }
-                        h3 { a("/template") { +"UI with templates" } }
-                        ul {
-                            for (event in stuff) {
-                                li { h4 { +event } }
-                            }
-                        }
-                        h2 { a("/login") { +"Login again" } }
-                    }
-                }
+                call.respond(FreeMarkerContent("index.ftl", mapOf("user" to accessToken, "events" to stuff), "e"))
             }
         }
 
