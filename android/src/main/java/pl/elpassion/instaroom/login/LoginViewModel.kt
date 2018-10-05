@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class LoginViewModel(loginRepository: LoginRepository) : ViewModel() {
+class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel() {
 
     private val googleTokenLiveData = MutableLiveData<String>()
 
@@ -13,4 +13,9 @@ class LoginViewModel(loginRepository: LoginRepository) : ViewModel() {
     }
 
     fun getGoogleToken(): LiveData<String> = googleTokenLiveData
+
+    fun saveGoogleToken(token: String) {
+        googleTokenLiveData.value = token
+        loginRepository.googleToken = token
+    }
 }

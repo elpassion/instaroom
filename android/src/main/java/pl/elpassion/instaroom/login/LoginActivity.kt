@@ -2,10 +2,7 @@ package pl.elpassion.instaroom.login
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast.LENGTH_LONG
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.widget.toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -41,7 +38,7 @@ class LoginActivity : AppCompatActivity() {
 
         model = ViewModelProviders.of(this, LoginViewModelFactory(DI.provideLoginRepository()))
             .get(LoginViewModel::class.java)
-        model.getGoogleToken().observe(this, Observer { toast("Token: $it") })
+        model.getGoogleToken().observe(this, Observer { showRoomsScreen() })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -54,12 +51,14 @@ class LoginActivity : AppCompatActivity() {
 
     private fun handleSignInResult(task: Task<GoogleSignInAccount>) {
         try {
-            val result = task.getResult(ApiException::class.java)
-            Log.d(javaClass.simpleName, "Token: ${result?.idToken}")
-            toast("Signed in", duration = LENGTH_LONG).show()
+            task.getResult(ApiException::class.java)?.idToken?.let(model::saveGoogleToken)
         } catch (e: ApiException) {
             e.printStackTrace()
         }
+    }
+
+    private fun showRoomsScreen() {
+        //TODO: show RoomsActivity
     }
 
     companion object {

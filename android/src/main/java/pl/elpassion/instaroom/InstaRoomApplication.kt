@@ -7,6 +7,6 @@ class InstaRoomApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        DI.provideLoginRepository = { LoginRepositoryImpl() }
+        DI.provideLoginRepository = { LoginRepositoryImpl(this) }
     }
 }

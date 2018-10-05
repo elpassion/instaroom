@@ -27,6 +27,7 @@ android {
 
 dependencies {
     def lifecycle_version = "2.0.0"
+    def android_commons_version = "0.0.23"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.0.0-alpha1'
@@ -36,9 +37,12 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
-    
+    implementation "com.github.elpassion.android-commons:shared-preferences:$android_commons_version"
+    implementation "com.github.elpassion.android-commons:shared-preferences-moshi-converter-adapter:$android_commons_version"
+    implementation "com.squareup.moshi:moshi-kotlin:1.7.0"
+
     testImplementation 'junit:junit:4.12'
-    
+
     androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
 }
