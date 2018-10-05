@@ -117,6 +117,7 @@ fun Application.module(testing: Boolean = false) {
                     body {
                         h2 { +"Hi user" }
                         h3 { +accessToken }
+                        h3 { a("/template") { +"UI with templates" } }
                         ul {
                             for (event in stuff) {
                                 li { h4 { +event } }
