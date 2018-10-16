@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.auth.GoogleAuthUtil
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -18,13 +17,13 @@ import kotlinx.coroutines.experimental.GlobalScope
 import kotlinx.coroutines.experimental.IO
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.startActivity
-import pl.elpassion.instaroom.DI
+import org.koin.android.viewmodel.ext.android.viewModel
 import pl.elpassion.instaroom.R
 import pl.elpassion.instaroom.dashboard.DashboardActivity
 
 class LoginActivity : AppCompatActivity() {
 
-    private lateinit var model: LoginViewModel
+    private val model: LoginViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,8 +44,6 @@ class LoginActivity : AppCompatActivity() {
             )
         }
 
-        model = ViewModelProviders.of(this, LoginViewModelFactory(DI.provideLoginRepository()))
-            .get(LoginViewModel::class.java)
         model.getGoogleToken().observe(this, Observer { token ->
             if (token != null) showRoomsScreen()
         })
