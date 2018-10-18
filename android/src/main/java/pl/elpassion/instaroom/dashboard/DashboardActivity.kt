@@ -4,26 +4,23 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.toast
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.elpassion.android.commons.recycler.adapters.basicAdapterWithLayoutAndBinder
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.item_room.view.*
-import pl.elpassion.instaroom.DI
+import org.koin.android.viewmodel.ext.android.viewModel
 import pl.elpassion.instaroom.R
 import pl.elpassion.instaroom.api.Room
 
 class DashboardActivity : AppCompatActivity() {
 
+    private val model: DashboardViewModel by viewModel()
     private val rooms = mutableListOf<Room>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
-        val model = ViewModelProviders.of(
-            this,
-            DashboardViewModelFactory(DI.provideInstaRoomApi(), DI.provideLoginRepository())
-        ).get(DashboardViewModel::class.java)
+
         model.getRooms().observe(this, Observer(::updateRooms))
         model.getError().observe(this, Observer { toast(it) })
 
@@ -48,5 +45,5 @@ class DashboardActivity : AppCompatActivity() {
 
     fun onRoomClicked(room: Room) {
 
-  }
+    }
 }
