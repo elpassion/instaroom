@@ -1,6 +1,4 @@
-val includeAndroid = false
-
+val includeAndroid = System.getenv("INCLUDE_ANDROID") == "true"
 include(":backend")
 
-@Suppress("ConstantConditionIf")
 if (includeAndroid) include(":android")
