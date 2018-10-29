@@ -1,9 +1,9 @@
 import org.jetbrains.kotlin.gradle.dsl.Coroutines
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val ktor_version: String by project
-val kotlin_version: String by project
-val logback_version: String by project
+val kotlinVersion: String by project
+val ktorVersion: String by project
+val logbackVersion: String by project
 
 plugins {
     application
@@ -29,23 +29,23 @@ repositories {
 }
 
 dependencies {
-    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version")
-    compile("io.ktor:ktor-server-netty:$ktor_version")
-    compile("ch.qos.logback:logback-classic:$logback_version")
-    compile("io.ktor:ktor-server-core:$ktor_version")
-    compile("io.ktor:ktor-html-builder:$ktor_version")
+    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
+    compile("io.ktor:ktor-server-netty:$ktorVersion")
+    compile("ch.qos.logback:logback-classic:$logbackVersion")
+    compile("io.ktor:ktor-server-core:$ktorVersion")
+    compile("io.ktor:ktor-html-builder:$ktorVersion")
     compile("org.jetbrains:kotlin-css-jvm:1.0.0-pre.31-kotlin-1.2.41")
-    compile("io.ktor:ktor-server-host-common:$ktor_version")
-    compile("io.ktor:ktor-server-sessions:$ktor_version")
-    compile("io.ktor:ktor-auth:$ktor_version")
-    compile("io.ktor:ktor-client-core:$ktor_version")
-    compile("io.ktor:ktor-client-core-jvm:$ktor_version")
-    compile("io.ktor:ktor-client-apache:$ktor_version")
-    compile("io.ktor:ktor-jackson:$ktor_version")
-    compile("io.ktor:ktor-freemarker:$ktor_version")
+    compile("io.ktor:ktor-server-host-common:$ktorVersion")
+    compile("io.ktor:ktor-server-sessions:$ktorVersion")
+    compile("io.ktor:ktor-auth:$ktorVersion")
+    compile("io.ktor:ktor-client-core:$ktorVersion")
+    compile("io.ktor:ktor-client-core-jvm:$ktorVersion")
+    compile("io.ktor:ktor-client-apache:$ktorVersion")
+    compile("io.ktor:ktor-jackson:$ktorVersion")
+    compile("io.ktor:ktor-freemarker:$ktorVersion")
     compile("com.google.apis:google-api-services-calendar:v3-rev305-1.23.0")
-    testCompile("io.ktor:ktor-server-tests:$ktor_version")
-    testCompile("io.ktor:ktor-client-mock:$ktor_version")
+    testCompile("io.ktor:ktor-server-tests:$ktorVersion")
+    testCompile("io.ktor:ktor-client-mock:$ktorVersion")
 }
 
 sourceSets["main"].resources.srcDirs("resources")

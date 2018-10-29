@@ -1,5 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.Coroutines
 
+val kotlinVersion: String by project
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -34,7 +36,6 @@ android {
 }
 
 dependencies {
-    val kotlinVersion = "1.2.71"
     val ankoVersion = "0.10.7"
     val lifecycleVersion = "2.0.0"
     val androidCommonsVersion = "0.0.23"
