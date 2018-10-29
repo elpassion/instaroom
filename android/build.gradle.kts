@@ -6,10 +6,6 @@ plugins {
     id("kotlin-android-extensions")
 }
 
-kotlin {
-    experimental.coroutines = Coroutines.ENABLE
-}
-
 android {
     compileSdkVersion(28)
 
@@ -44,7 +40,7 @@ dependencies {
     val androidCommonsVersion = "0.0.23"
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:0.30.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.0")
     implementation("androidx.core:core-ktx:1.0.0-alpha1")
     implementation("androidx.appcompat:appcompat:1.0.0")
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")

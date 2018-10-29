@@ -48,8 +48,6 @@ dependencies {
     testCompile("io.ktor:ktor-client-mock:$ktor_version")
 }
 
-kotlin.experimental.coroutines = Coroutines.ENABLE
-
 sourceSets["main"].resources.srcDirs("resources")
 sourceSets["test"].resources.srcDirs("testresources")
 

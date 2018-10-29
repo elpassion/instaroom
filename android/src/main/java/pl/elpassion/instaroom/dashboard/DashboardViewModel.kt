@@ -3,16 +3,15 @@ package pl.elpassion.instaroom.dashboard
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.experimental.CoroutineScope
-import kotlinx.coroutines.experimental.Dispatchers
-import kotlinx.coroutines.experimental.IO
-import kotlinx.coroutines.experimental.Job
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import pl.elpassion.instaroom.api.InstaRoomApi
 import pl.elpassion.instaroom.api.Room
 import pl.elpassion.instaroom.login.LoginRepository
 import retrofit2.HttpException
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.CoroutineContext
 
 class DashboardViewModel(
     private val instaRoomApi: InstaRoomApi,
