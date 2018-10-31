@@ -40,7 +40,7 @@ import kotlinx.css.*
 import kotlinx.html.*
 import kotlin.collections.set
 
-fun main(args: Array<String>): Unit = io.ktor.server.netty.DevelopmentEngine.main(args)
+fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 enum class Salka(val title: String, val calendarId: String) {
 

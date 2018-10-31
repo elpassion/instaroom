@@ -1,13 +1,11 @@
 import org.jetbrains.kotlin.gradle.dsl.Coroutines
 
+val kotlinVersion: String by project
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
     id("kotlin-android-extensions")
-}
-
-kotlin {
-    experimental.coroutines = Coroutines.ENABLE
 }
 
 android {
@@ -38,13 +36,12 @@ android {
 }
 
 dependencies {
-    val kotlinVersion = "1.2.71"
     val ankoVersion = "0.10.7"
     val lifecycleVersion = "2.0.0"
     val androidCommonsVersion = "0.0.23"
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:0.30.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.0")
     implementation("androidx.core:core-ktx:1.0.0-alpha1")
     implementation("androidx.appcompat:appcompat:1.0.0")
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
