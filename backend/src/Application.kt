@@ -1,12 +1,7 @@
 package pl.elpassion.instaroom
 
 import com.fasterxml.jackson.databind.SerializationFeature
-import com.google.api.client.auth.oauth2.BearerToken
-import com.google.api.client.auth.oauth2.Credential
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
-import com.google.api.client.json.jackson2.JacksonFactory
-import com.google.api.client.util.DateTime
-import com.google.api.services.calendar.Calendar
+import configHeadCommitHash
 import freemarker.cache.ClassTemplateLoader
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
@@ -19,7 +14,8 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.origin
-import io.ktor.freemarker.*
+import io.ktor.freemarker.FreeMarker
+import io.ktor.freemarker.FreeMarkerContent
 import io.ktor.html.respondHtml
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
@@ -36,7 +32,7 @@ import io.ktor.routing.post
 import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.sessions.*
-import kotlinx.css.*
+import kotlinx.css.CSSBuilder
 import kotlinx.html.*
 import kotlin.collections.set
 
@@ -87,13 +83,18 @@ fun Application.module(testing: Boolean = false) {
 
             val accessToken = call.sessions.get<MySession>()?.accessToken
 
+            println("Current commit hash: $configHeadCommitHash")
             println("Current access token: $accessToken")
 
             if (accessToken === null) {
                 call.respond(FreeMarkerContent("home.ftl",mapOf("user" to ""), "e"))
             } else {
                 val stuff = calendarStuff(accessToken)
-                call.respond(FreeMarkerContent("index.ftl", mapOf("user" to accessToken, "events" to stuff), "e"))
+                call.respond(FreeMarkerContent("index.ftl", mapOf(
+                    "commit" to configHeadCommitHash,
+                    "user" to accessToken,
+                    "events" to stuff
+                ), "e"))
             }
         }
 
