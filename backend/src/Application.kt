@@ -83,46 +83,36 @@ fun Application.module(testing: Boolean = false) {
 
             val accessToken = call.sessions.get<MySession>()?.accessToken
 
-            println("Current commit hash: $configHeadCommitHash")
+            val hash = configHeadCommitHash
+
+            println("Current commit hash: $hash")
             println("Current access token: $accessToken")
 
-            if (accessToken === null) {
-                call.respond(FreeMarkerContent("home.ftl",mapOf("user" to ""), "e"))
-            } else {
-                val stuff = calendarStuff(accessToken)
-                call.respond(FreeMarkerContent("index.ftl", mapOf(
-                    "commit" to configHeadCommitHash,
-                    "user" to accessToken,
-                    "events" to stuff
-                ), "e"))
-            }
+            accessToken ?: return@get call.respond(FreeMarkerContent("home.ftl",mapOf("user" to ""), "e"))
+
+            val stuff = calendarStuff(accessToken)
+            call.respond(FreeMarkerContent("index.ftl", mapOf(
+                "commit" to hash,
+                "user" to accessToken,
+                "events" to stuff
+            ), "e"))
         }
 
         get("/rooms") {
             val accessToken = call.request.headers["AccessToken"]
-            if (accessToken === null) {
-                call.respond(HttpStatusCode.Unauthorized, "No access token provided")
-            }
-            else {
-                val rooms = getSomeRooms(accessToken)
-                val data = mapOf("rooms" to rooms)
-                call.respond(data)
-            }
+            accessToken ?: return@get call.respond(HttpStatusCode.Unauthorized, "No access token provided")
+            val rooms = getSomeRooms(accessToken)
+            val data = mapOf("rooms" to rooms)
+            call.respond(data)
         }
 
         post("/book") {
             val accessToken = call.request.headers["AccessToken"]
             val calendarId = call.request.headers["CalendarId"]
-            if (accessToken === null) {
-                call.respond(HttpStatusCode.Unauthorized, "No access token provided")
-            }
-            else if (calendarId == null) {
-                call.respond(HttpStatusCode.ExpectationFailed, "No calendar id provided")
-            }
-            else {
-                val result = bookSomeRoom(accessToken, calendarId)
-                call.respond(result)
-            }
+            accessToken ?: return@post call.respond(HttpStatusCode.Unauthorized, "No access token provided")
+            calendarId ?: return@post call.respond(HttpStatusCode.ExpectationFailed, "No calendar id provided")
+            val result = bookSomeRoom(accessToken, calendarId)
+            call.respond(result)
         }
 
         get("/html-dsl") {
