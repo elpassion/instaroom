@@ -6,6 +6,8 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.client.util.DateTime
 import com.google.api.services.calendar.Calendar
+import com.google.api.services.calendar.model.EventAttendee
+import com.google.api.services.calendar.model.EventDateTime
 
 enum class Salka(val title: String, val calendarId: String) {
 
@@ -34,12 +36,7 @@ private val jsonFactory = JacksonFactory.getDefaultInstance()
 
 fun calendarStuff(token: String): List<String> {
 
-    val credential = Credential(BearerToken.authorizationHeaderAccessMethod()).setAccessToken(token)
-
-    val service = Calendar.Builder(transport, jsonFactory, credential)
-        .setApplicationName("Instaroom")
-        .build()
-
+    val service = createCalendarService(token)
 
     val results = try {
         listOf("Salka przy developerach") + service.getSomeEventsStrings(idSalkaPrzyDeveloperach) +
@@ -55,35 +52,38 @@ fun calendarStuff(token: String): List<String> {
 }
 
 fun bookSomeRoom(accessToken: String, calendarId: String): String {
-    val credential = Credential(BearerToken.authorizationHeaderAccessMethod()).setAccessToken(accessToken)
 
-    val service = Calendar.Builder(transport, jsonFactory, credential)
-        .setApplicationName("Instaroom")
-        .build()
+    val service = createCalendarService(accessToken)
 
     return try {
         service.bookSomeRoom(calendarId)
-    }
-    catch (e: Exception) {
+    } catch (e: Exception) {
         "Blad bookowania salki $e"
     }
-
 }
 
-private fun Calendar.bookSomeRoom(calendarId: String): String {
-    events().quickAdd(calendarId, "ZAJETE").execute()
+private fun Calendar.bookSomeRoom(roomCalendarId: String): String {
+    val events = events()
+    val newEvent = com.google.api.services.calendar.model.Event().apply {
+        summary = "InstaRoom"
+        attendees = listOf(EventAttendee().apply { email = roomCalendarId })
+        start = EventDateTime().apply { dateTime = DateTime(System.currentTimeMillis()) }
+        end = EventDateTime().apply { dateTime = DateTime(System.currentTimeMillis() + 15 * 60 * 1000) }
+    }
+    events.insert("primary", newEvent).execute()
     return "OK"
 }
 
-fun getSomeRooms(accessToken: String): List<Room> {
-    val credential = Credential(BearerToken.authorizationHeaderAccessMethod()).setAccessToken(accessToken)
+private fun createCredential(accessToken: String) =
+    Credential(BearerToken.authorizationHeaderAccessMethod()).setAccessToken(accessToken)
 
-    val service = Calendar.Builder(transport, jsonFactory, credential)
-        .setApplicationName("Instaroom")
-        .build()
+private fun createCalendarService(credential: Credential) =
+    Calendar.Builder(transport, jsonFactory, credential).setApplicationName("Instaroom").build()
 
-    return service.getSomeRooms()
-}
+private fun createCalendarService(accessToken: String) =
+    createCalendarService(createCredential(accessToken))
+
+fun getSomeRooms(accessToken: String) = createCalendarService(accessToken).getSomeRooms()
 
 private fun Calendar.getSomeRooms() = listOf(
     getRoom("Salka przy deweloperach", idSalkaPrzyDeveloperach),
