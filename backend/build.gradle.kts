@@ -53,3 +53,10 @@ sourceSets["test"].resources.srcDirs("testresources")
 
 kotlin.sourceSets["main"].kotlin.srcDirs("src")
 kotlin.sourceSets["test"].kotlin.srcDirs("test")
+
+tasks.register("createConfig") {
+    val hash = getHeadCommitHash()
+    file("src/Config.kt").writeText("val configHeadCommitHash = \"$hash\"")
+}
+
+tasks.named<Task>("assemble") { dependsOn("createConfig") }
