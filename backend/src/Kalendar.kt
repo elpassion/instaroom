@@ -21,7 +21,7 @@ enum class Salka(val title: String, val calendarId: String) {
 
 data class Event(val name: String?, val startTime: String, val endTime: String)
 
-data class Room(val name: String?, val calendarId: String, val isFreeNow: Boolean, val events: List<Event>)
+data class Room(val name: String?, val calendarId: String, val events: List<Event>)
 
 
 private val idSalkaPrzyDeveloperach = "elpassion.pl_2d3431363530383233373435@resource.calendar.google.com"
@@ -87,7 +87,7 @@ private fun Calendar.getSomeRooms() = listOf(
 )
 
 private fun Calendar.getRoom(name: String, calendarId: String) =
-    Room(name, calendarId, true, getSomeEvents(calendarId)) // TODO: isFreeNow support
+    Room(name, calendarId, getSomeEvents(calendarId))
 
 private fun Calendar.getSomeEvents(calendarId: String) =
     events().list(calendarId)
