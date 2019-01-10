@@ -10,8 +10,6 @@ import io.ktor.application.install
 import io.ktor.auth.*
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.apache.Apache
-import io.ktor.client.request.get
-import io.ktor.client.request.header
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.origin
 import io.ktor.freemarker.FreeMarker
@@ -26,6 +24,7 @@ import io.ktor.jackson.jackson
 import io.ktor.request.host
 import io.ktor.request.port
 import io.ktor.response.respond
+import io.ktor.response.respondRedirect
 import io.ktor.response.respondText
 import io.ktor.routing.get
 import io.ktor.routing.post
@@ -57,7 +56,7 @@ fun Application.module(testing: Boolean = false) {
         oauth("google-oauth") {
             client = HttpClient(Apache)
             providerLookup = { googleOauthProvider }
-            urlProvider = { redirectUrl("/login") }
+            urlProvider = { redirectUrl("/") }
         }
     }
 
@@ -69,31 +68,14 @@ fun Application.module(testing: Boolean = false) {
     }
 
     routing {
-        get("/template") {
-            val user = "user name"
-
-            val accessToken = call.sessions.get<MySession>()?.accessToken
-
-            val calendarStuff = accessToken?.let { calendarStuff(it) } ?: listOf("No access token")
-
-            call.respond(FreeMarkerContent("index.ftl", mapOf("user" to user, "events" to calendarStuff), "e"))
-        }
 
         get("/") {
-
-            val accessToken = call.sessions.get<MySession>()?.accessToken
-
+            val token = call.sessions.get<MySession>()?.accessToken ?: return@get call.respondRedirect("/login")
             val hash = configHeadCommitHash
-
-            println("Current commit hash: $hash")
-            println("Current access token: $accessToken")
-
-            accessToken ?: return@get call.respond(FreeMarkerContent("home.ftl",mapOf("user" to ""), "e"))
-
-            val stuff = calendarStuff(accessToken)
+            val stuff = calendarStuff(token)
             call.respond(FreeMarkerContent("index.ftl", mapOf(
                 "commit" to hash,
-                "user" to accessToken,
+                "user" to token,
                 "events" to stuff
             ), "e"))
         }
@@ -115,49 +97,30 @@ fun Application.module(testing: Boolean = false) {
             call.respond(result)
         }
 
-        get("/html-dsl") {
+        // Static feature. Try to access `/static/ktor_logo.svg`
+        static("/static") { resources("static") }
+
+        get("/map") {
+            val token = call.sessions.get<MySession>()?.accessToken ?: return@get call.respondRedirect("/login")
+            val rooms = getSomeRooms(token)
             call.respondHtml {
                 body {
-                    h1 { +"HTML" }
+                    h1 { +"MAP" }
                     ul {
-                        for (n in 1..10) {
-                            li { +"$n" }
+                        for (room in rooms) {
+                            li { +"$room" }
                         }
                     }
                 }
             }
-        }
-
-        // Static feature. Try to access `/static/ktor_logo.svg`
-        static("/static") {
-            resources("static")
         }
 
         authenticate("google-oauth") {
-            route("/login") {
-                handle {
-                    val principal = call.authentication.principal<OAuthAccessTokenResponse.OAuth2>()
-                        ?: error("No principal")
-
-                    val accessToken = principal.accessToken
-
-                    call.sessions.set(MySession(accessToken))
-
-                    val json = HttpClient(Apache).get<String>("https://www.googleapis.com/userinfo/v2/me") {
-                        header("Authorization", "Bearer $accessToken")
-                    }
-
-                    println(json)
-
-                    call.respondHtml {
-                        body {
-                            h2 { +"User details" }
-                            code { +json }
-                            h2 { a("/") { +"Go back to calendar" } }
-                        }
-                    }
-                }
-            }
+            route("/login") { handle {
+                val token = call.authentication.principal<OAuthAccessTokenResponse.OAuth2>()!!.accessToken
+                call.sessions.set(MySession(token))
+                call.respondRedirect("/")
+            } }
         }
     }
 }
