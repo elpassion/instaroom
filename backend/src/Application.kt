@@ -52,9 +52,9 @@ enum class Salka(val title: String, val calendarId: String) {
 
 }
 
-data class Event(val name: String, val startTime: String, val endTime: String)
+data class Event(val name: String?, val startTime: String, val endTime: String)
 
-data class Room(val name: String, val calendarId: String, val isFreeNow: Boolean, val events: List<Event>)
+data class Room(val name: String?, val calendarId: String, val isFreeNow: Boolean, val events: List<Event>)
 
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
