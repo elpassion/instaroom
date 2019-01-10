@@ -51,24 +51,17 @@ fun calendarStuff(token: String): List<String> {
     return results
 }
 
-fun bookSomeRoom(accessToken: String, calendarId: String): String {
-
-    val service = createCalendarService(accessToken)
-
-    return try {
-        service.bookSomeRoom(calendarId)
-    } catch (e: Exception) {
-        "Blad bookowania salki $e"
-    }
-}
+fun bookSomeRoom(accessToken: String, calendarId: String) =
+    createCalendarService(accessToken).bookSomeRoom(calendarId)
 
 private fun Calendar.bookSomeRoom(roomCalendarId: String): String {
     val events = events()
+    val now = System.currentTimeMillis()
     val newEvent = com.google.api.services.calendar.model.Event().apply {
         summary = "InstaRoom"
         attendees = listOf(EventAttendee().apply { email = roomCalendarId })
-        start = EventDateTime().apply { dateTime = DateTime(System.currentTimeMillis()) }
-        end = EventDateTime().apply { dateTime = DateTime(System.currentTimeMillis() + 15 * 60 * 1000) }
+        start = EventDateTime().apply { dateTime = DateTime(now) }
+        end = EventDateTime().apply { dateTime = DateTime(now + 15 * 60 * 1000) }
     }
     events.insert("primary", newEvent).execute()
     return "OK"
