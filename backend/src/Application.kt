@@ -1,6 +1,7 @@
 package pl.elpassion.instaroom
 
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.google.api.client.http.HttpResponseException
 import configHeadCommitHash
 import freemarker.cache.ClassTemplateLoader
 import io.ktor.application.Application
@@ -56,7 +57,7 @@ fun Application.module(testing: Boolean = false) {
         oauth("google-oauth") {
             client = HttpClient(Apache)
             providerLookup = { googleOauthProvider }
-            urlProvider = { redirectUrl("/") }
+            urlProvider = { redirectUrl("/login") }
         }
     }
 
@@ -71,13 +72,7 @@ fun Application.module(testing: Boolean = false) {
 
         get("/") {
             val token = call.sessions.get<MySession>()?.accessToken ?: return@get call.respondRedirect("/login")
-            val hash = configHeadCommitHash
-            val stuff = calendarStuff(token)
-            call.respond(FreeMarkerContent("index.ftl", mapOf(
-                "commit" to hash,
-                "user" to token,
-                "events" to stuff
-            ), "e"))
+            call.respond(createMainContent(token))
         }
 
         get("/rooms") {
@@ -102,16 +97,23 @@ fun Application.module(testing: Boolean = false) {
 
         get("/map") {
             val token = call.sessions.get<MySession>()?.accessToken ?: return@get call.respondRedirect("/login")
-            val rooms = getSomeRooms(token)
-            call.respondHtml {
-                body {
-                    h1 { +"MAP" }
-                    ul {
-                        for (room in rooms) {
-                            li { +"$room" }
+            try {
+                val rooms = getSomeRooms(token)
+                call.respondHtml {
+                    body {
+                        h1 { +"MAP" }
+                        ul {
+                            for (room in rooms) {
+                                li { +"$room" }
+                            }
                         }
                     }
                 }
+            }
+            catch(e: HttpResponseException) {
+                if (e.statusCode == 401) call.respondRedirect("/login")
+                if (e.statusCode == 404) call.respondText("No rooms found for this account")
+                else throw e
             }
         }
 
@@ -123,6 +125,18 @@ fun Application.module(testing: Boolean = false) {
             } }
         }
     }
+}
+
+private fun createMainContent(token: String): FreeMarkerContent {
+    val hash = configHeadCommitHash
+    val stuff = calendarStuff(token)
+    return FreeMarkerContent(
+        "index.ftl", mapOf(
+            "commit" to hash,
+            "user" to token,
+            "events" to stuff
+        ), "e"
+    )
 }
 
 data class MySession(val accessToken: String)
