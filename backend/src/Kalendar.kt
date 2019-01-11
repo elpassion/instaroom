@@ -15,49 +15,63 @@ enum class Salka(
     val title: String,
     val calendarId: String,
     val titleColor: String,
+    val borderColor: String,
     val backgroundColor: String,
     val code: String
 ) {
     SALKA_PRZY_DEVELOPERACH(
         title = "Salka przy deweloperach",
         calendarId = "elpassion.pl_2d3431363530383233373435@resource.calendar.google.com",
-        titleColor = "",
-        backgroundColor = "",
+        titleColor = "#FFD73F4C",
+        borderColor = "#FFFFD2D6",
+        backgroundColor = "#FFE9EB",
         code = "SPD"
     ),
     SALKA_PRZY_RECEPCJI(
         title = "Salka przy recepcji",
         calendarId = "elpassion.pl_3336373234343038393630@resource.calendar.google.com",
-        titleColor = "",
-        backgroundColor = "",
+        titleColor = "#FFE6DEDA",
+        borderColor = "#FFCEBDB6",
+        backgroundColor = "#FFE6DEDA",
         code = "SPR"
     ),
     SALKA_ZIELONA(
         title = "Salka zielona",
         calendarId = "elpassion.pl_36303736393039313938@resource.calendar.google.com",
-        titleColor = "",
-        backgroundColor = "",
+        titleColor = "#FF25B963",
+        borderColor = "#FFB1F3DC",
+        backgroundColor = "#FFE9F9F0",
         code = "SZI"
     ),
     SALKA_ZOLTA(
         title = "Salka zolta",
         calendarId = "elpassion.pl_2d3837303539373033363132@resource.calendar.google.com",
-        titleColor = "",
-        backgroundColor = "",
+        titleColor = "#FFC3720A",
+        borderColor = "#FFFFFDFB",
+        backgroundColor = "#FFFFF1DF",
         code = "SZO"
     ),
     SALKA_PRZY_GRAFIKACH(
         title = "Salka przy grafikach",
         calendarId = "elpassion.pl_34313639343833323536@resource.calendar.google.com",
-        titleColor = "",
-        backgroundColor = "",
+        titleColor = "#FF5D34D2",
+        borderColor = "#FFD7C9FF",
+        backgroundColor = "#FFEBE4FF",
         code = "SPG"
     )
 }
 
 data class Event(val name: String?, val startTime: String, val endTime: String)
 
-data class Room(val name: String?, val calendarId: String, val events: List<Event>)
+data class Room(
+    val name: String?,
+    val calendarId: String,
+    val events: List<Event>,
+    val titleColor: String,
+    val borderColor: String,
+    val backgroundColor: String,
+    val code: String
+)
 
 private val transport = GoogleNetHttpTransport.newTrustedTransport()
 
@@ -103,9 +117,15 @@ fun getSomeRooms(accessToken: String) = createCalendarService(accessToken).getSo
 
 private fun Calendar.getSomeRooms() = Salka.values().map(this::getRoom)
 
-private fun Calendar.getRoom(salka: Salka) = getRoom(salka.title, salka.calendarId)
-
-private fun Calendar.getRoom(name: String, calendarId: String) = Room(name, calendarId, getSomeEvents(calendarId))
+private fun Calendar.getRoom(salka: Salka) = Room(
+    name = salka.title,
+    calendarId = salka.calendarId,
+    events = getSomeEvents(salka.calendarId),
+    titleColor = salka.titleColor,
+    borderColor = salka.borderColor,
+    backgroundColor = salka.backgroundColor,
+    code = salka.code
+)
 
 private fun Calendar.getSomeEvents(calendarId: String) =
     events().list(calendarId)
