@@ -61,7 +61,7 @@ enum class Salka(
     )
 }
 
-data class Event(val name: String?, val startTime: String, val endTime: String)
+data class Event(val id: String, val name: String?, val startTime: String, val endTime: String)
 
 data class Room(
     val name: String?,
@@ -135,7 +135,7 @@ private fun Calendar.getSomeEvents(calendarId: String) =
         .setSingleEvents(true)
         .execute()
         .items
-        .map { Event(it.summary, it.start.dateTime.toString(), it.end.dateTime.toString()) }
+        .map { Event(it.id, it.summary, it.start.dateTime.toString(), it.end.dateTime.toString()) }
 
 private fun Calendar.getSomeEventsStrings(salka: Salka) = listOf(salka.title) + getSomeEventsStrings(salka.calendarId)
 
