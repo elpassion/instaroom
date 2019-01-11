@@ -159,8 +159,6 @@ private val ApplicationRequest.hostPort get() = host()!! + port().let { port ->
 }
 
 private fun ApplicationRequest.requireHttps() {
-    return // TODO: reenable it
-    @Suppress("UNREACHABLE_CODE")
     origin.scheme == "https" || origin.host == "instaroom.elpassion.pl" || throw IllegalArgumentException("Use https!")
 }
 

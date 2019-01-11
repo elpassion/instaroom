@@ -10,6 +10,10 @@ suspend fun ApplicationCall.respondMapContent(token: String) {
     try {
         val rooms = getSomeRooms(token)
         respondHtml {
+            head {
+                title("Instaroom Map")
+                jsscript("static/jquery-1.10.2.js", "static/noh.js", "static/map-content.js")
+            }
             body {
                 h1 { +"MAP" }
                 ul {
@@ -17,6 +21,7 @@ suspend fun ApplicationCall.respondMapContent(token: String) {
                         li { +"$room" }
                     }
                 }
+                div { id = "map_content" }
             }
         }
     }
@@ -26,3 +31,5 @@ suspend fun ApplicationCall.respondMapContent(token: String) {
         else throw e
     }
 }
+
+private fun HEAD.jsscript(vararg srcs: String) = srcs.forEach { script("text/javascript", it) {} }
