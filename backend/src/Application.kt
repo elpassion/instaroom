@@ -2,7 +2,7 @@ package pl.elpassion.instaroom
 
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.google.api.client.http.HttpResponseException
-import configHeadCommitHash
+import createMarkerContent
 import freemarker.cache.ClassTemplateLoader
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
@@ -14,7 +14,6 @@ import io.ktor.client.engine.apache.Apache
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.origin
 import io.ktor.freemarker.FreeMarker
-import io.ktor.freemarker.FreeMarkerContent
 import io.ktor.html.respondHtml
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
@@ -35,6 +34,7 @@ import io.ktor.routing.routing
 import io.ktor.sessions.*
 import kotlinx.css.CSSBuilder
 import kotlinx.html.*
+import respondMapContent
 import kotlin.collections.set
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
@@ -74,7 +74,7 @@ fun Application.module(testing: Boolean = false) {
         get("/") {
             call.request.requireHttps()
             val token = call.sessions.get<MySession>()?.accessToken ?: return@get call.respondRedirect("/login")
-            call.respond(createMainContent(token))
+            call.respond(createMarkerContent(token))
         }
 
         get("/rooms") {
@@ -102,24 +102,7 @@ fun Application.module(testing: Boolean = false) {
         get("/map") {
             call.request.requireHttps()
             val token = call.sessions.get<MySession>()?.accessToken ?: return@get call.respondRedirect("/login")
-            try {
-                val rooms = getSomeRooms(token)
-                call.respondHtml {
-                    body {
-                        h1 { +"MAP" }
-                        ul {
-                            for (room in rooms) {
-                                li { +"$room" }
-                            }
-                        }
-                    }
-                }
-            }
-            catch(e: HttpResponseException) {
-                if (e.statusCode == 401) call.respondRedirect("/login")
-                if (e.statusCode == 404) call.respondText("No rooms found for this account")
-                else throw e
-            }
+            call.respondMapContent(token)
         }
 
         get("/map-rooms") {
@@ -139,18 +122,6 @@ fun Application.module(testing: Boolean = false) {
             } }
         }
     }
-}
-
-private fun createMainContent(token: String): FreeMarkerContent {
-    val hash = configHeadCommitHash
-    val stuff = calendarStuff(token)
-    return FreeMarkerContent(
-        "index.ftl", mapOf(
-            "commit" to hash,
-            "user" to token,
-            "events" to stuff
-        ), "e"
-    )
 }
 
 data class MySession(val accessToken: String)
