@@ -30,7 +30,7 @@ enum class Salka(
     SALKA_PRZY_RECEPCJI(
         title = "Salka przy recepcji",
         calendarId = "elpassion.pl_3336373234343038393630@resource.calendar.google.com",
-        titleColor = "#FFE6DEDA",
+        titleColor = "#FF451A05",
         borderColor = "#FFCEBDB6",
         backgroundColor = "#FFE6DEDA",
         code = "SPR"
@@ -44,10 +44,10 @@ enum class Salka(
         code = "SZI"
     ),
     SALKA_ZOLTA(
-        title = "Salka zolta",
+        title = "Salka żółta",
         calendarId = "elpassion.pl_2d3837303539373033363132@resource.calendar.google.com",
         titleColor = "#FFC3720A",
-        borderColor = "#FFFFFDFB",
+        borderColor = "#FFFFE2BE",
         backgroundColor = "#FFFFF1DF",
         code = "SZO"
     ),
