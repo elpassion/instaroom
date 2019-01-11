@@ -122,6 +122,14 @@ fun Application.module(testing: Boolean = false) {
             }
         }
 
+        get("/map-rooms") {
+            call.request.requireHttps()
+            val token = call.sessions.get<MySession>()?.accessToken ?: return@get call.respondRedirect("/login")
+            val rooms = getSomeRooms(token)
+            val data = mapOf("rooms" to rooms)
+            call.respond(data)
+        }
+
         authenticate("google-oauth") {
             route("/login") { handle {
                 call.request.requireHttps()
