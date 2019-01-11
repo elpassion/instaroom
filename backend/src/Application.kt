@@ -22,6 +22,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.resources
 import io.ktor.http.content.static
 import io.ktor.jackson.jackson
+import io.ktor.request.ApplicationRequest
 import io.ktor.request.host
 import io.ktor.request.port
 import io.ktor.response.respond
@@ -71,11 +72,13 @@ fun Application.module(testing: Boolean = false) {
     routing {
 
         get("/") {
+            call.request.requireHttps()
             val token = call.sessions.get<MySession>()?.accessToken ?: return@get call.respondRedirect("/login")
             call.respond(createMainContent(token))
         }
 
         get("/rooms") {
+            call.request.requireHttps()
             val accessToken = call.request.headers["AccessToken"]
             accessToken ?: return@get call.respond(HttpStatusCode.Unauthorized, "No access token provided")
             val rooms = getSomeRooms(accessToken)
@@ -84,6 +87,7 @@ fun Application.module(testing: Boolean = false) {
         }
 
         post("/book") {
+            call.request.requireHttps()
             val accessToken = call.request.headers["AccessToken"]
             val calendarId = call.request.headers["CalendarId"]
             accessToken ?: return@post call.respond(HttpStatusCode.Unauthorized, "No access token provided")
@@ -96,6 +100,7 @@ fun Application.module(testing: Boolean = false) {
         static("/static") { resources("static") }
 
         get("/map") {
+            call.request.requireHttps()
             val token = call.sessions.get<MySession>()?.accessToken ?: return@get call.respondRedirect("/login")
             try {
                 val rooms = getSomeRooms(token)
@@ -119,6 +124,7 @@ fun Application.module(testing: Boolean = false) {
 
         authenticate("google-oauth") {
             route("/login") { handle {
+                call.request.requireHttps()
                 val token = call.authentication.principal<OAuthAccessTokenResponse.OAuth2>()!!.accessToken
                 call.sessions.set(MySession(token))
                 call.respondRedirect("/")
@@ -166,10 +172,14 @@ val googleOauthProvider = OAuthServerSettings.OAuth2ServerSettings(
     defaultScopes = listOf("profile", "https://www.googleapis.com/auth/calendar.events")
 )
 
-private fun ApplicationCall.redirectUrl(path: String): String {
-    val defaultPort = if (request.origin.scheme == "http") 80 else 443
-    val hostPort = request.host()!! + request.port().let { port -> if (port == defaultPort) "" else ":$port" }
-    val protocol = request.origin.scheme
-    return "$protocol://$hostPort$path"
+private fun ApplicationCall.redirectUrl(path: String) = "${request.origin.scheme}://${request.hostPort}$path"
+
+private val ApplicationRequest.hostPort get() = host()!! + port().let { port ->
+    val defaultPort = if (origin.scheme == "http") 80 else 443
+    if (port == defaultPort) "" else ":$port"
+}
+
+private fun ApplicationRequest.requireHttps() {
+    origin.scheme == "https" || origin.host == "instaroom.elpassion.pl" || throw IllegalArgumentException("Use https!")
 }
 
