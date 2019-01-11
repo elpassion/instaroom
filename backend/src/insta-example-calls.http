@@ -7,12 +7,17 @@
 
 GET http://instaroom.elpassion.pl:8080/rooms
 Accept: application/json
-AccessToken: ya29.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxfaketoken
+AccessToken: ya29.Gl2OBvz5GP7ZlOyjEXAdUETtw_U5ixmAvnDBNd4VN7RU9_HlMZiOAvTbogB4wMOpbs-_JRqZ-rw9muhMqiTOefqWL-orMpooC02AdzswE90EDqCdpkXemWUkrQbP9Ok
+###
+
+GET http://instaroom.elpassion.pl:8080/map-rooms
+Accept: application/json
+Cookie: MY_SESSION=accessToken%3D%2523sya29%2EGl2OBvz5GP7ZlOyjEXAdUETtw%5FU5ixmAvnDBNd4VN7RU9%5FHlMZiOAvTbogB4wMOpbs%2D%5FJRqZ%2Drw9muhMqiTOefqWL%2DorMpooC02AdzswE90EDqCdpkXemWUkrQbP9Ok
 ###
 
 POST http://instaroom.elpassion.pl:8080/book
 Content-Type: application/json
-AccessToken: ya29.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxfaketoken
+AccessToken: ya29.Gl2OBvz5GP7ZlOyjEXAdUETtw_U5ixmAvnDBNd4VN7RU9_HlMZiOAvTbogB4wMOpbs-_JRqZ-rw9muhMqiTOefqWL-orMpooC02AdzswE90EDqCdpkXemWUkrQbP9Ok
 CalendarId: elpassion.pl_36303736393039313938@resource.calendar.google.com
 {}
 ###
