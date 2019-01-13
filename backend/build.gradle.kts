@@ -29,6 +29,7 @@ repositories {
 }
 
 dependencies {
+    compile(project(":kalendar"))
     compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     compile("io.ktor:ktor-server-netty:$ktorVersion")
     compile("ch.qos.logback:logback-classic:$logbackVersion")
@@ -43,7 +44,6 @@ dependencies {
     compile("io.ktor:ktor-client-apache:$ktorVersion")
     compile("io.ktor:ktor-jackson:$ktorVersion")
     compile("io.ktor:ktor-freemarker:$ktorVersion")
-    compile("com.google.apis:google-api-services-calendar:v3-rev305-1.23.0")
     testCompile("io.ktor:ktor-server-tests:$ktorVersion")
     testCompile("io.ktor:ktor-client-mock:$ktorVersion")
 }

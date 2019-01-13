@@ -1,4 +1,4 @@
-package pl.elpassion.instaroom
+package pl.elpassion.instaroom.kalendar
 
 import com.google.api.client.auth.oauth2.BearerToken
 import com.google.api.client.auth.oauth2.Credential

@@ -1,5 +1,5 @@
 import io.ktor.freemarker.FreeMarkerContent
-import pl.elpassion.instaroom.calendarStuff
+import pl.elpassion.instaroom.kalendar.calendarStuff
 
 fun createMarkerContent(token: String): FreeMarkerContent {
     val hash = configHeadCommitHash

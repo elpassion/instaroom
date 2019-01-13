@@ -1,7 +1,6 @@
 package pl.elpassion.instaroom
 
 import com.fasterxml.jackson.databind.SerializationFeature
-import com.google.api.client.http.HttpResponseException
 import createMarkerContent
 import freemarker.cache.ClassTemplateLoader
 import io.ktor.application.Application
@@ -14,7 +13,6 @@ import io.ktor.client.engine.apache.Apache
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.origin
 import io.ktor.freemarker.FreeMarker
-import io.ktor.html.respondHtml
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -33,7 +31,11 @@ import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.sessions.*
 import kotlinx.css.CSSBuilder
-import kotlinx.html.*
+import kotlinx.html.CommonAttributeGroupFacade
+import kotlinx.html.FlowOrMetaDataContent
+import kotlinx.html.style
+import pl.elpassion.instaroom.kalendar.bookSomeRoom
+import pl.elpassion.instaroom.kalendar.getSomeRooms
 import respondMapContent
 import kotlin.collections.set
 

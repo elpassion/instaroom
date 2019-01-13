@@ -4,7 +4,7 @@ import io.ktor.html.respondHtml
 import io.ktor.response.respondRedirect
 import io.ktor.response.respondText
 import kotlinx.html.*
-import pl.elpassion.instaroom.getSomeRooms
+import pl.elpassion.instaroom.kalendar.getSomeRooms
 
 suspend fun ApplicationCall.respondMapContent(token: String) {
     try {
