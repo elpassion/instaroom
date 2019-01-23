@@ -4,6 +4,7 @@ import com.google.api.client.auth.oauth2.BearerToken
 import com.google.api.client.auth.oauth2.Credential
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.http.HttpResponseException
+import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.client.util.DateTime
 import com.google.api.services.calendar.Calendar
@@ -73,7 +74,7 @@ data class Room(
     val code: String
 )
 
-private val transport = GoogleNetHttpTransport.newTrustedTransport()
+private val transport = NetHttpTransport()
 
 private val jsonFactory = JacksonFactory.getDefaultInstance()
 
