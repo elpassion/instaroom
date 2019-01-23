@@ -1,1 +1,1 @@
-val configHeadCommitHash = "0276011"
+val configHeadCommitHash = "039b3fa"

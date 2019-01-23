@@ -161,6 +161,6 @@ private val ApplicationRequest.hostPort get() = host()!! + port().let { port ->
 }
 
 private fun ApplicationRequest.requireHttps() {
-    origin.scheme == "https" || origin.host == "instaroom.elpassion.pl" || throw IllegalArgumentException("Use https!")
+//    origin.scheme == "https" || origin.host == "instaroom.elpassion.pl" || throw IllegalArgumentException("Use https!")
 }
 
