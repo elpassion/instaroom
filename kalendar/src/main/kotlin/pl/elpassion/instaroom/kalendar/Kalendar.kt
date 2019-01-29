@@ -74,6 +74,8 @@ data class Room(
     val code: String
 )
 
+data class BookingEvent(val calendarId: String, val title: String, val userEmail: String, val startDate: DateTime, val endDate: DateTime)
+
 private val transport = NetHttpTransport()
 
 private val jsonFactory = JacksonFactory.getDefaultInstance()
@@ -82,6 +84,18 @@ fun calendarStuff(token: String): List<String> {
     val service = createCalendarService(token)
     return try { Salka.values().flatMap(service::getSomeEventsStrings) }
     catch (e: HttpResponseException) { listOf(e.message.orEmpty()) }
+}
+
+fun bookRoomWithEvent(accessToken: String, bookingEvent: BookingEvent) {
+    val events = events()
+    val newEvent = com.google.api.services.calendar.model.Event().apply {
+        summary = bookingEvent.title
+        attendees = listOf(EventAttendee().apply { email = bookingEvent.calendarId })
+        start = EventDateTime().apply { dateTime = bookingEvent.startDate }
+        end = EventDateTime().apply { dateTime = bookingEvent.endDate }
+    }
+    events.insert("primary", newEvent).execute()
+    return "OK"
 }
 
 fun bookSomeRoom(accessToken: String, calendarId: String) =
