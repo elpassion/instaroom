@@ -89,7 +89,7 @@ fun calendarStuff(token: String): List<String> {
 fun bookSomeRoom(accessToken: String, bookingEvent: BookingEvent) =
     createCalendarService(accessToken).bookRoomWithEvent(bookingEvent)
 
-private fun Calendar.bookRoomWithEvent(bookingEvent: BookingEvent) {
+private fun Calendar.bookRoomWithEvent(bookingEvent: BookingEvent): String {
     val events = events()
     val newEvent = com.google.api.services.calendar.model.Event().apply {
         summary = bookingEvent.title
