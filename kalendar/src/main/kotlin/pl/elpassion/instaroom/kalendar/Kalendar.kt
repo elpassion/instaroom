@@ -2,7 +2,6 @@ package pl.elpassion.instaroom.kalendar
 
 import com.google.api.client.auth.oauth2.BearerToken
 import com.google.api.client.auth.oauth2.Credential
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.http.HttpResponseException
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
@@ -74,7 +73,13 @@ data class Room(
     val code: String
 )
 
-data class BookingEvent(val calendarId: String, val title: String, val userEmail: String, val startDate: DateTime, val endDate: DateTime)
+data class BookingEvent(
+    val calendarId: String,
+    val title: String,
+    val userEmail: String,
+    val startDate: DateTime,
+    val endDate: DateTime
+)
 
 private val transport = NetHttpTransport()
 
@@ -82,14 +87,17 @@ private val jsonFactory = JacksonFactory.getDefaultInstance()
 
 fun calendarStuff(token: String): List<String> {
     val service = createCalendarService(token)
-    return try { Salka.values().flatMap(service::getSomeEventsStrings) }
-    catch (e: HttpResponseException) { listOf(e.message.orEmpty()) }
+    return try {
+        Salka.values().flatMap(service::getSomeEventsStrings)
+    } catch (e: HttpResponseException) {
+        listOf(e.message.orEmpty())
+    }
 }
 
 fun bookSomeRoom(accessToken: String, bookingEvent: BookingEvent) =
     createCalendarService(accessToken).bookRoomWithEvent(bookingEvent)
 
-private fun Calendar.bookRoomWithEvent(bookingEvent: BookingEvent): String {
+private fun Calendar.bookRoomWithEvent(bookingEvent: BookingEvent): Event? {
     val events = events()
     val newEvent = com.google.api.services.calendar.model.Event().apply {
         summary = bookingEvent.title
@@ -97,14 +105,21 @@ private fun Calendar.bookRoomWithEvent(bookingEvent: BookingEvent): String {
         start = EventDateTime().apply { dateTime = bookingEvent.startDate }
         end = EventDateTime().apply { dateTime = bookingEvent.endDate }
     }
-    events.insert("primary", newEvent).execute()
-    return "OK"
+    val ev = events.insert("primary", newEvent).execute()
+    return if (ev != null)
+        Event(
+            ev.id,
+            ev.htmlLink,
+            ev.summary,
+            ev.start.dateTime.toString(),
+            ev.end.dateTime.toString()
+        ) else null
 }
 
 fun bookSomeRoom(accessToken: String, calendarId: String) =
     createCalendarService(accessToken).bookSomeRoom(calendarId)
 
-private fun Calendar.bookSomeRoom(roomCalendarId: String): String {
+private fun Calendar.bookSomeRoom(roomCalendarId: String): Event? {
     val events = events()
     val now = System.currentTimeMillis()
     val newEvent = com.google.api.services.calendar.model.Event().apply {
@@ -113,8 +128,16 @@ private fun Calendar.bookSomeRoom(roomCalendarId: String): String {
         start = EventDateTime().apply { dateTime = DateTime(now) }
         end = EventDateTime().apply { dateTime = DateTime(now + 15 * 60 * 1000) }
     }
-    events.insert("primary", newEvent).execute()
-    return "OK"
+    val ev = events.insert("primary", newEvent).execute()
+    return if (ev != null)
+        Event(
+            ev.id,
+            ev.htmlLink,
+            ev.summary,
+            ev.start.dateTime.toString(),
+            ev.end.dateTime.toString()
+        ) else null
+
 }
 
 private val counter = AtomicInteger(0)
@@ -153,7 +176,11 @@ private fun Calendar.getSomeEvents(calendarId: String) =
         .setSingleEvents(true)
         .execute()
         .items
-        .map { Event(it.id, it.htmlLink, it.summary, it.start.dateTime.toString(), it.end.dateTime.toString()) }
+        .map { calendarEventToEvent(it) }
+
+private fun calendarEventToEvent(event: com.google.api.services.calendar.model.Event): Event =
+    Event(event.id, event.htmlLink, event.summary, event.start.dateTime.toString(), event.end.dateTime.toString())
+
 
 private fun Calendar.getSomeEventsStrings(salka: Salka) = listOf(salka.title) + getSomeEventsStrings(salka.calendarId)
 
