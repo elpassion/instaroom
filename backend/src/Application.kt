@@ -95,7 +95,8 @@ fun Application.module(testing: Boolean = false) {
             accessToken ?: return@post call.respond(HttpStatusCode.Unauthorized, "No access token provided")
             calendarId ?: return@post call.respond(HttpStatusCode.ExpectationFailed, "No calendar id provided")
             val result = bookSomeRoom(accessToken, calendarId)
-            call.respond(result)
+            //TODO: respond sth
+//            call.respond(result)
         }
 
         // Static feature. Try to access `/static/ktor_logo.svg`
