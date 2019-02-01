@@ -94,7 +94,7 @@ fun calendarStuff(token: String): List<String> {
     }
 }
 
-fun bookSomeRoom(accessToken: String, bookingEvent: BookingEvent) =
+fun bookSomeRoom(accessToken: String, bookingEvent: BookingEvent): Event? =
     createCalendarService(accessToken).bookRoomWithEvent(bookingEvent)
 
 private fun Calendar.bookRoomWithEvent(bookingEvent: BookingEvent): Event? {
@@ -116,7 +116,7 @@ private fun Calendar.bookRoomWithEvent(bookingEvent: BookingEvent): Event? {
         ) else null
 }
 
-fun bookSomeRoom(accessToken: String, calendarId: String) =
+fun bookSomeRoom(accessToken: String, calendarId: String): Event? =
     createCalendarService(accessToken).bookSomeRoom(calendarId)
 
 private fun Calendar.bookSomeRoom(roomCalendarId: String): Event? {
