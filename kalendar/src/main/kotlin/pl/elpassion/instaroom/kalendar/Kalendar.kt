@@ -101,11 +101,11 @@ private fun Calendar.bookRoomWithEvent(bookingEvent: BookingEvent): Event? {
     val events = events()
     val newEvent = com.google.api.services.calendar.model.Event().apply {
         summary = bookingEvent.title
-        attendees = listOf(EventAttendee().apply { email = bookingEvent.calendarId })
+        attendees = listOf(EventAttendee().apply { email = bookingEvent.userEmail })
         start = EventDateTime().apply { dateTime = bookingEvent.startDate }
         end = EventDateTime().apply { dateTime = bookingEvent.endDate }
     }
-    val ev = events.insert("primary", newEvent).execute()
+    val ev = events.insert(bookingEvent.calendarId, newEvent).execute()
     return if (ev != null)
         Event(
             ev.id,
@@ -128,7 +128,7 @@ private fun Calendar.bookSomeRoom(roomCalendarId: String): Event? {
         start = EventDateTime().apply { dateTime = DateTime(now) }
         end = EventDateTime().apply { dateTime = DateTime(now + 15 * 60 * 1000) }
     }
-    val ev = events.insert("primary", newEvent).execute()
+    val ev = events.insert(roomCalendarId, newEvent).execute()
     return if (ev != null)
         Event(
             ev.id,
