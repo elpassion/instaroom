@@ -83,7 +83,7 @@ fun Application.module(testing: Boolean = false) {
             call.request.requireHttps()
             val accessToken = call.request.headers["AccessToken"]
             accessToken ?: return@get call.respond(HttpStatusCode.Unauthorized, "No access token provided")
-            val rooms = getSomeRooms(accessToken)
+            val rooms = getSomeRooms(accessToken, "")
             val data = mapOf("rooms" to rooms)
             call.respond(data)
         }
@@ -111,7 +111,7 @@ fun Application.module(testing: Boolean = false) {
         get("/map-rooms") {
             call.request.requireHttps()
             val token = call.sessions.get<MySession>()?.accessToken ?: return@get call.respondRedirect("/login")
-            val rooms = getSomeRooms(token)
+            val rooms = getSomeRooms(token, "")
             val data = mapOf("rooms" to rooms)
             call.respond(data)
         }

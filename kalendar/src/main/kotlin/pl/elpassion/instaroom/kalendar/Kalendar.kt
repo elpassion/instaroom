@@ -61,7 +61,14 @@ enum class Salka(
     )
 }
 
-data class Event(val id: String, val htmlLink: String?, val name: String?, val startTime: String, val endTime: String)
+data class Event(
+    val id: String,
+    val htmlLink: String?,
+    val name: String?,
+    val startTime: String,
+    val endTime: String,
+    val isOwnBooked: Boolean
+)
 
 data class Room(
     val name: String?,
@@ -85,10 +92,10 @@ private val transport = NetHttpTransport()
 
 private val jsonFactory = JacksonFactory.getDefaultInstance()
 
-fun calendarStuff(token: String): List<String> {
+fun calendarStuff(token: String, userEmail: String): List<String> {
     val service = createCalendarService(token)
     return try {
-        Salka.values().flatMap(service::getSomeEventsStrings)
+        Salka.values().flatMap{service.getSomeEventsStrings(it, userEmail)}
     } catch (e: HttpResponseException) {
         listOf(e.message.orEmpty())
     }
@@ -112,7 +119,8 @@ private fun Calendar.bookRoomWithEvent(bookingEvent: BookingEvent): Event? {
             ev.htmlLink,
             ev.summary,
             ev.start.dateTime.toString(),
-            ev.end.dateTime.toString()
+            ev.end.dateTime.toString(),
+            true
         ) else null
 }
 
@@ -135,7 +143,8 @@ private fun Calendar.bookSomeRoom(roomCalendarId: String): Event? {
             ev.htmlLink,
             ev.summary,
             ev.start.dateTime.toString(),
-            ev.end.dateTime.toString()
+            ev.end.dateTime.toString(),
+            true
         ) else null
 
 }
@@ -154,21 +163,21 @@ private fun createCalendarService(credential: Credential) =
 private fun createCalendarService(accessToken: String) =
     createCalendarService(createCredential(accessToken))
 
-fun getSomeRooms(accessToken: String) = createCalendarService(accessToken).getSomeRooms()
+fun getSomeRooms(accessToken: String, userEmail: String) = createCalendarService(accessToken).getSomeRooms(userEmail)
 
-private fun Calendar.getSomeRooms() = Salka.values().map(this::getRoom)
+private fun Calendar.getSomeRooms(userEmail: String) = Salka.values().map{getRoom(it, userEmail)}
 
-private fun Calendar.getRoom(salka: Salka) = Room(
+private fun Calendar.getRoom(salka: Salka, userEmail: String) = Room(
     name = salka.title,
     calendarId = salka.calendarId,
-    events = getSomeEvents(salka.calendarId),
+    events = getSomeEvents(salka.calendarId, userEmail),
     titleColor = salka.titleColor,
     borderColor = salka.borderColor,
     backgroundColor = salka.backgroundColor,
     code = salka.code
 )
 
-private fun Calendar.getSomeEvents(calendarId: String) =
+private fun Calendar.getSomeEvents(calendarId: String, userEmail: String) =
     events().list(calendarId)
         .setMaxResults(3)
         .setTimeMin(DateTime(System.currentTimeMillis()))
@@ -176,13 +185,13 @@ private fun Calendar.getSomeEvents(calendarId: String) =
         .setSingleEvents(true)
         .execute()
         .items
-        .map { calendarEventToEvent(it) }
+        .map { calendarEventToEvent(it, userEmail) }
 
-private fun calendarEventToEvent(event: com.google.api.services.calendar.model.Event): Event =
-    Event(event.id, event.htmlLink, event.summary, event.start.dateTime.toString(), event.end.dateTime.toString())
+private fun calendarEventToEvent(event: com.google.api.services.calendar.model.Event, userEmail: String): Event =
+    Event(event.id, event.htmlLink, event.summary, event.start.dateTime.toString(), event.end.dateTime.toString(), event.organizer.email==userEmail)
 
 
-private fun Calendar.getSomeEventsStrings(salka: Salka) = listOf(salka.title) + getSomeEventsStrings(salka.calendarId)
+private fun Calendar.getSomeEventsStrings(salka: Salka, userEmail: String) = listOf(salka.title) + getSomeEventsStrings(salka.calendarId, userEmail)
 
-private fun Calendar.getSomeEventsStrings(calendarId: String) =
-    getSomeEvents(calendarId).map { "${it.name} (${it.startTime} - ${it.endTime})" } + listOf("and the calendar id is: $calendarId")
+private fun Calendar.getSomeEventsStrings(calendarId: String, userEmail: String) =
+    getSomeEvents(calendarId, userEmail).map { "${it.name} (${it.startTime} - ${it.endTime})" } + listOf("and the calendar id is: $calendarId")

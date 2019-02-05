@@ -8,7 +8,7 @@ import pl.elpassion.instaroom.kalendar.getSomeRooms
 
 suspend fun ApplicationCall.respondMapContent(token: String) {
     try {
-        val rooms = getSomeRooms(token)
+        val rooms = getSomeRooms(token, "")
         respondHtml {
             head {
                 title("Instaroom Map")
