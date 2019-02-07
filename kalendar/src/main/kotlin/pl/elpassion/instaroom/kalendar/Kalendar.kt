@@ -149,6 +149,15 @@ private fun Calendar.bookSomeRoom(roomCalendarId: String): Event? {
 
 }
 
+fun deleteEvent(accessToken: String, eventId: String) {
+    createCalendarService(accessToken).deleteEvent(eventId)
+}
+
+private fun Calendar.deleteEvent(eventId: String) {
+    val events = events()
+    events.delete("primary", eventId).execute()
+}
+
 private val counter = AtomicInteger(0)
 
 private fun createEventSummary(roomCalendarId: String) =
