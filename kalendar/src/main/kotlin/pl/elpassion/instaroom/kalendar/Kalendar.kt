@@ -179,7 +179,7 @@ private fun Calendar.getRoom(salka: Salka, userEmail: String) = Room(
 
 private fun Calendar.getSomeEvents(calendarId: String, userEmail: String) =
     events().list(calendarId)
-        .setMaxResults(3)
+        .setMaxResults(5)
         .setTimeMin(DateTime(System.currentTimeMillis()))
         .setOrderBy("startTime")
         .setSingleEvents(true)
