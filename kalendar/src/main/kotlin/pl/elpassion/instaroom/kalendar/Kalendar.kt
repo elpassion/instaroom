@@ -155,7 +155,9 @@ fun deleteEvent(accessToken: String, eventId: String) {
 
 private fun Calendar.deleteEvent(eventId: String) {
     val events = events()
-    events.delete("primary", eventId).execute()
+    println("result start")
+    val result = events.delete("primary", eventId).execute()
+    println("result stop")
 }
 
 private val counter = AtomicInteger(0)
