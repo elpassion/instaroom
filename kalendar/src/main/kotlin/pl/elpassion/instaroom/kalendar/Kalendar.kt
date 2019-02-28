@@ -11,12 +11,10 @@ import com.google.api.services.calendar.Calendar
 import com.google.api.services.calendar.model.EventAttendee
 import com.google.api.services.calendar.model.EventDateTime
 import com.google.api.services.calendar.model.Events
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.suspendCancellableCoroutine
+import java.util.concurrent.Future
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.coroutines.resume
-import java.util.concurrent.*
-
 
 enum class Salka(
     val title: String,
@@ -156,18 +154,12 @@ private fun Calendar.bookSomeRoom(roomCalendarId: String): Event? {
 
 }
 
-suspend fun deleteEvent(accessToken: String, eventId: String) {
+fun deleteEvent(accessToken: String, eventId: String) {
     createCalendarService(accessToken).deleteEvent(eventId)
 }
 
-private suspend fun Calendar.deleteEvent(eventId: String) =
-    suspendCancellableCoroutine<Unit> {
-        val events = events()
-
-        val result = events.delete("primary", eventId).buildHttpRequest()
-    }
-
-
+private fun Calendar.deleteEvent(eventId: String) =
+    events().delete("primary", eventId).execute()
 
 private val counter = AtomicInteger(0)
 
@@ -209,6 +201,11 @@ private suspend fun Calendar.getSomeEvents(calendarId: String, userEmail: String
             .buildHttpRequest()
             .executeAsync()
 
+        cont.invokeOnCancellation {
+            println("backend: cancel invoked!")
+            if(!future.isDone) future.cancel(true)
+        }
+
         while (!cont.isCancelled) {
             if (future.isDone) {
                 println("backend: future is done!")
@@ -217,17 +214,12 @@ private suspend fun Calendar.getSomeEvents(calendarId: String, userEmail: String
                         .items
                         .map { calendarEventToEvent(it, userEmail) }
 
-                println("backend: resuming")
+                println("backend: resuming with events = $events")
                 cont.resume(events)
-            } else {
-              Thread.sleep(10)
+                break
             }
         }
 
-        cont.invokeOnCancellation {
-            println("backend: cancel invoked!")
-            if(!future.isDone) future.cancel(true)
-        }
     }
 
 
@@ -242,7 +234,7 @@ private fun calendarEventToEvent(event: com.google.api.services.calendar.model.E
     )
 
 
-suspend private fun Calendar.getSomeEventsStrings(salka: Salka, userEmail: String) =
+private suspend fun Calendar.getSomeEventsStrings(salka: Salka, userEmail: String) =
     listOf(salka.title) + getSomeEventsStrings(salka.calendarId, userEmail)
 
 private suspend fun Calendar.getSomeEventsStrings(calendarId: String, userEmail: String) =
