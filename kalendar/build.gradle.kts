@@ -11,6 +11,8 @@ version = "0.0.2"
 dependencies {
     compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     compile("com.google.apis:google-api-services-calendar:v3-rev305-1.23.0")
+    compile("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.1")
+    compile("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.0.1")
 }
 
 // Create sources Jar from main kotlin sources

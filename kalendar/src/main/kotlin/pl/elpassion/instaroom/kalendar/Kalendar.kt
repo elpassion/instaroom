@@ -2,6 +2,7 @@ package pl.elpassion.instaroom.kalendar
 
 import com.google.api.client.auth.oauth2.BearerToken
 import com.google.api.client.auth.oauth2.Credential
+import com.google.api.client.http.HttpResponse
 import com.google.api.client.http.HttpResponseException
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
@@ -9,7 +10,13 @@ import com.google.api.client.util.DateTime
 import com.google.api.services.calendar.Calendar
 import com.google.api.services.calendar.model.EventAttendee
 import com.google.api.services.calendar.model.EventDateTime
+import com.google.api.services.calendar.model.Events
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.coroutines.resume
+import java.util.concurrent.*
+
 
 enum class Salka(
     val title: String,
@@ -92,10 +99,10 @@ private val transport = NetHttpTransport()
 
 private val jsonFactory = JacksonFactory.getDefaultInstance()
 
-fun calendarStuff(token: String, userEmail: String): List<String> {
+suspend fun calendarStuff(token: String, userEmail: String): List<String> {
     val service = createCalendarService(token)
     return try {
-        Salka.values().flatMap{service.getSomeEventsStrings(it, userEmail)}
+        Salka.values().flatMap { service.getSomeEventsStrings(it, userEmail) }
     } catch (e: HttpResponseException) {
         listOf(e.message.orEmpty())
     }
@@ -149,16 +156,18 @@ private fun Calendar.bookSomeRoom(roomCalendarId: String): Event? {
 
 }
 
-fun deleteEvent(accessToken: String, eventId: String) {
+suspend fun deleteEvent(accessToken: String, eventId: String) {
     createCalendarService(accessToken).deleteEvent(eventId)
 }
 
-private fun Calendar.deleteEvent(eventId: String) {
-    val events = events()
-    println("result start")
-    val result = events.delete("primary", eventId).execute()
-    println("result stop")
-}
+private suspend fun Calendar.deleteEvent(eventId: String) =
+    suspendCancellableCoroutine<Unit> {
+        val events = events()
+
+        val result = events.delete("primary", eventId).buildHttpRequest()
+    }
+
+
 
 private val counter = AtomicInteger(0)
 
@@ -174,11 +183,12 @@ private fun createCalendarService(credential: Credential) =
 private fun createCalendarService(accessToken: String) =
     createCalendarService(createCredential(accessToken))
 
-fun getSomeRooms(accessToken: String, userEmail: String) = createCalendarService(accessToken).getSomeRooms(userEmail)
+suspend fun getSomeRooms(accessToken: String, userEmail: String) =
+    createCalendarService(accessToken).getSomeRooms(userEmail)
 
-private fun Calendar.getSomeRooms(userEmail: String) = Salka.values().map{getRoom(it, userEmail)}
+private suspend fun Calendar.getSomeRooms(userEmail: String) = Salka.values().map { getRoom(it, userEmail) }
 
-private fun Calendar.getRoom(salka: Salka, userEmail: String) = Room(
+private suspend fun Calendar.getRoom(salka: Salka, userEmail: String) = Room(
     name = salka.title,
     calendarId = salka.calendarId,
     events = getSomeEvents(salka.calendarId, userEmail),
@@ -188,21 +198,55 @@ private fun Calendar.getRoom(salka: Salka, userEmail: String) = Room(
     code = salka.code
 )
 
-private fun Calendar.getSomeEvents(calendarId: String, userEmail: String) =
-    events().list(calendarId)
-        .setMaxResults(5)
-        .setTimeMin(DateTime(System.currentTimeMillis()))
-        .setOrderBy("startTime")
-        .setSingleEvents(true)
-        .execute()
-        .items
-        .map { calendarEventToEvent(it, userEmail) }
+private suspend fun Calendar.getSomeEvents(calendarId: String, userEmail: String): List<Event> =
+
+    suspendCancellableCoroutine { cont ->
+        val future: Future<HttpResponse> = events().list(calendarId)
+            .setMaxResults(5)
+            .setTimeMin(DateTime(System.currentTimeMillis()))
+            .setOrderBy("startTime")
+            .setSingleEvents(true)
+            .buildHttpRequest()
+            .executeAsync()
+
+        while (!cont.isCancelled) {
+            if (future.isDone) {
+                println("backend: future is done!")
+                val events =
+                    future.get().parseAs(Events::class.java)
+                        .items
+                        .map { calendarEventToEvent(it, userEmail) }
+
+                println("backend: resuming")
+                cont.resume(events)
+            } else {
+              Thread.sleep(10)
+            }
+        }
+
+        cont.invokeOnCancellation {
+            println("backend: cancel invoked!")
+            if(!future.isDone) future.cancel(true)
+        }
+    }
+
 
 private fun calendarEventToEvent(event: com.google.api.services.calendar.model.Event, userEmail: String): Event =
-    Event(event.id, event.htmlLink, event.summary, event.start.dateTime.toString(), event.end.dateTime.toString(), event.organizer.email==userEmail)
+    Event(
+        event.id,
+        event.htmlLink,
+        event.summary,
+        event.start.dateTime.toString(),
+        event.end.dateTime.toString(),
+        event.organizer.email == userEmail
+    )
 
 
-private fun Calendar.getSomeEventsStrings(salka: Salka, userEmail: String) = listOf(salka.title) + getSomeEventsStrings(salka.calendarId, userEmail)
+suspend private fun Calendar.getSomeEventsStrings(salka: Salka, userEmail: String) =
+    listOf(salka.title) + getSomeEventsStrings(salka.calendarId, userEmail)
 
-private fun Calendar.getSomeEventsStrings(calendarId: String, userEmail: String) =
-    getSomeEvents(calendarId, userEmail).map { "${it.name} (${it.startTime} - ${it.endTime})" } + listOf("and the calendar id is: $calendarId")
+private suspend fun Calendar.getSomeEventsStrings(calendarId: String, userEmail: String) =
+    getSomeEvents(
+        calendarId,
+        userEmail
+    ).map { "${it.name} (${it.startTime} - ${it.endTime})" } + listOf("and the calendar id is: $calendarId")
